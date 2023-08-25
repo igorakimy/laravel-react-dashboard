@@ -168,9 +168,17 @@ const updatedBook = {
     pages: 1210,
 };
 
-const summary = `${title}, a ${pages} a book was writter by ${author} and published in ${publicationDate
-    .split("-")
-    .join("/")} ${hasMovieAdaptation ? "" : "not"} been adapted as a movie`;
+const summary = `${title}, a ${pages} a book was writter by ${author} and published in ${
+    publicationDate.split("-")[0]
+} ${hasMovieAdaptation ? "" : "not"} been adapted as a movie`;
 
 const pagesRange = pages > 1000 ? "over a thousand" : "less than 1000";
 console.log(`The book has ${pagesRange} pages`);
+
+// function getYear(str) {
+//     return str.split("-")[0];
+// }
+
+const getYear = (str) => str.split("-")[0];
+
+console.log(getYear(publicationDate));
