@@ -145,7 +145,7 @@ function getBook(id) {
 
 const book = getBook(2);
 
-const { title, author, genres } = book;
+const { title, author, genres, pages, publicationDate } = book;
 
 console.log(title, author, genres);
 
@@ -166,4 +166,7 @@ const updatedBook = {
     // Overwriting an existing property
     pages: 1210,
 };
-updatedBook;
+
+const summary = `${title}, a ${pages} a book was writter by ${author} and published in ${publicationDate
+    .split("-")
+    .join("/")}`;
