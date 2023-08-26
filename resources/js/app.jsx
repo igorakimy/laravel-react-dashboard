@@ -6,10 +6,6 @@ const root = createRoot(rootElement);
 
 const apiRoot = "http://laravel-react.local/api";
 
-function App() {
-  return <h1>Hello React!</h1>;
-}
-
 async function getPizzas() {
   const res = await fetch(`${apiRoot}/pizzas`);
   const data = await res.json();
@@ -27,9 +23,29 @@ function Pizza() {
   );
 }
 
+function Header() {
+  return <h1>Fast React Pizza Co.</h1>;
+}
+
+function Menu() {
+  return (
+    <div>
+      <h2>Our Menu</h2>
+      <Pizza />
+    </div>
+  );
+}
+
+function Footer() {
+  return (
+    <footer>{new Date().toLocaleTimeString()}. We're currently open!</footer>
+  );
+}
+
 root.render(
   <StrictMode>
-    <App />
-    <Pizza />
+    <Header />
+    <Menu />
+    <Footer />
   </StrictMode>
 );
