@@ -25,13 +25,16 @@ function App() {
   );
 }
 
-function Pizza() {
+function Pizza(props) {
   const pizzaData = getPizzas();
   return (
     <div className="pizza">
-      <img src="pizzas/pizza1.jpg" alt="" />
-      <h3></h3>
-      <p></p>
+      <img src={props.photo_name} alt={props.name} />
+      <div>
+        <h3>{props.name}</h3>
+        <p>{props.ingredients}</p>
+        <span>{props.price + 3}</span>
+      </div>
     </div>
   );
 }
@@ -48,7 +51,14 @@ function Menu() {
   return (
     <div className="menu">
       <h2>Our Menu</h2>
-      <Pizza />
+      <div className="pizzas">
+        <Pizza
+          name="Pizza Name"
+          photo_name="pizzas/pizza1.jpg"
+          ingredients="Ingredients"
+          price={20}
+        />
+      </div>
     </div>
   );
 }
