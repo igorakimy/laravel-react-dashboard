@@ -53,7 +53,7 @@ function Menu() {
     <div className="menu">
       <h2>Our Menu</h2>
 
-      {pizzas.length > 0 && (
+      {pizzas.length > 0 ? (
         <div className="pizzas">
           {pizzas.map((pizza, i) => {
             return (
@@ -67,6 +67,8 @@ function Menu() {
             );
           })}
         </div>
+      ) : (
+        <p>We're still working on our menu. Please come back later :)</p>
       )}
     </div>
   );
@@ -85,11 +87,15 @@ function Footer() {
   return (
     <footer>
       <span style={style}>{new Date().toLocaleTimeString()}</span>
-      {isOpened && (
+      {isOpened ? (
         <div className="order">
           <p>We're open until {closeHour}:00. Come visit us or order online.</p>
           <button className="btn">Order Now</button>
         </div>
+      ) : (
+        <p>
+          We're happy to welcome you between {openHour}:00 and {closeHour}:00
+        </p>
       )}
     </footer>
   );
