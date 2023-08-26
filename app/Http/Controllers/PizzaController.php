@@ -19,7 +19,8 @@ class PizzaController extends Controller
                 'ingredients',
                 'price',
                 'photo_name',
-            ])->limit(10)->get()
+                'sold_out',
+            ])->limit(30)->get()
         );
     }
 

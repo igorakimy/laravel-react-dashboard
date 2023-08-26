@@ -20,6 +20,8 @@ function App() {
 }
 
 function Pizza(props) {
+  if (props.sold_out) return null;
+
   return (
     <div className="pizza">
       <img src={props.photo_name} alt={props.name} />
@@ -63,6 +65,7 @@ function Menu() {
                 photo_name={pizza.photo_name}
                 ingredients={pizza.ingredients}
                 price={pizza.price}
+                sold_out={pizza.sold_out}
               />
             );
           })}
