@@ -225,3 +225,13 @@ const essetialData = books.map((book) => ({
     reviewsCount: getTotalReviewCount(book),
 }));
 console.log(essetialData);
+
+const longBooks = books
+    .filter((book) => book.pages > 500)
+    .filter((book) => book.hasMovieAdaptation);
+console.log(longBooks);
+
+const adventureBooks = books
+    .filter((book) => book.genres.includes("adventure"))
+    .map((book) => book.title);
+console.log(adventureBooks);
