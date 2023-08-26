@@ -79,7 +79,7 @@ function Menu() {
 
 function Footer() {
   const hour = new Date().getHours();
-  const openHour = 1;
+  const openHour = 12;
   const closeHour = 22;
   const isOpened = hour >= openHour && hour <= closeHour;
 
@@ -89,9 +89,9 @@ function Footer() {
 
   return (
     <footer>
-      <span style={style}>{new Date().toLocaleTimeString()}</span>
+      Current time: <span style={style}>{new Date().toLocaleTimeString()}</span>
       {isOpened ? (
-        <Order closeHour={closeHour} />
+        <Order openHour={openHour} closeHour={closeHour} />
       ) : (
         <p>
           We're happy to welcome you between {openHour}:00 and {closeHour}:00
@@ -101,11 +101,12 @@ function Footer() {
   );
 }
 
-function Order(props) {
+function Order({ openHour, closeHour }) {
   return (
     <div className="order">
       <p>
-        We're open until {props.closeHour}:00. Come visit us or order online.
+        We're open from {openHour}:00 to {closeHour}:00. Come visit us or order
+        online.
       </p>
       <button className="btn">Order Now</button>
     </div>
