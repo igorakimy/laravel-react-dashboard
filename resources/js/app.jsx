@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 // Imoprt styles file
@@ -8,12 +8,6 @@ const rootElement = document.getElementById("app");
 const root = createRoot(rootElement);
 
 const apiRoot = "http://laravel-react.local/api";
-
-async function getPizzas() {
-  const res = await fetch(`${apiRoot}/pizzas`);
-  const data = await res.json();
-  return data;
-}
 
 function App() {
   return (
@@ -26,14 +20,13 @@ function App() {
 }
 
 function Pizza(props) {
-  const pizzaData = getPizzas();
   return (
     <div className="pizza">
       <img src={props.photo_name} alt={props.name} />
       <div>
         <h3>{props.name}</h3>
         <p>{props.ingredients}</p>
-        <span>{props.price + 3}</span>
+        <span>{props.price}</span>
       </div>
     </div>
   );
@@ -48,16 +41,29 @@ function Header() {
 }
 
 function Menu() {
+  const [pizzas, setPizzas] = useState([]);
+
+  useEffect(() => {
+    fetch(`${apiRoot}/pizzas`)
+      .then((res) => res.json())
+      .then((data) => setPizzas(data.data));
+  }, []);
+
   return (
     <div className="menu">
       <h2>Our Menu</h2>
       <div className="pizzas">
-        <Pizza
-          name="Pizza Name"
-          photo_name="pizzas/pizza1.jpg"
-          ingredients="Ingredients"
-          price={20}
-        />
+        {pizzas.map((pizza, i) => {
+          return (
+            <Pizza
+              key={i}
+              name={pizza.name}
+              photo_name={pizza.photo_name}
+              ingredients={pizza.ingredients}
+              price={pizza.price}
+            />
+          );
+        })}
       </div>
     </div>
   );

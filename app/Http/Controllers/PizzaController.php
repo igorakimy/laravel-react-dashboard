@@ -13,7 +13,14 @@ class PizzaController extends Controller
      */
     public function index()
     {
-        return new PizzaCollection(Pizza::all());
+        return new PizzaCollection(
+            Pizza::query()->select([
+                'name',
+                'ingredients',
+                'price',
+                'photo_name',
+            ])->limit(10)->get()
+        );
     }
 
     /**

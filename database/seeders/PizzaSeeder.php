@@ -13,6 +13,6 @@ class PizzaSeeder extends Seeder
      */
     public function run(): void
     {
-        Pizza::factory(100)->create();
+        Pizza::factory(5000)->create();
     }
 }
