@@ -26,7 +26,7 @@ function Pizza(props) {
       <div>
         <h3>{props.name}</h3>
         <p>{props.ingredients}</p>
-        <span>{props.price}</span>
+        <span>${props.price}</span>
       </div>
     </div>
   );
@@ -52,19 +52,22 @@ function Menu() {
   return (
     <div className="menu">
       <h2>Our Menu</h2>
-      <div className="pizzas">
-        {pizzas.map((pizza, i) => {
-          return (
-            <Pizza
-              key={i}
-              name={pizza.name}
-              photo_name={pizza.photo_name}
-              ingredients={pizza.ingredients}
-              price={pizza.price}
-            />
-          );
-        })}
-      </div>
+
+      {pizzas.length > 0 && (
+        <div className="pizzas">
+          {pizzas.map((pizza, i) => {
+            return (
+              <Pizza
+                key={i}
+                name={pizza.name}
+                photo_name={pizza.photo_name}
+                ingredients={pizza.ingredients}
+                price={pizza.price}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -81,8 +84,13 @@ function Footer() {
 
   return (
     <footer>
-      <span style={style}>{new Date().toLocaleTimeString()}</span>. We're
-      currently open!
+      <span style={style}>{new Date().toLocaleTimeString()}</span>
+      {isOpened && (
+        <div className="order">
+          <p>We're open until {closeHour}:00. Come visit us or order online.</p>
+          <button className="btn">Order Now</button>
+        </div>
+      )}
     </footer>
   );
 }
