@@ -1,6 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+// Imoprt styles file
+import "../css/app.css";
+
 const rootElement = document.getElementById("app");
 const root = createRoot(rootElement);
 
@@ -12,24 +15,38 @@ async function getPizzas() {
   return data;
 }
 
+function App() {
+  return (
+    <div className="container">
+      <Header />
+      <Menu />
+      <Footer />
+    </div>
+  );
+}
+
 function Pizza() {
   const pizzaData = getPizzas();
   return (
-    <div>
+    <div className="pizza">
       <img src="pizzas/pizza1.jpg" alt="" />
-      <h2></h2>
+      <h3></h3>
       <p></p>
     </div>
   );
 }
 
 function Header() {
-  return <h1>Fast React Pizza Co.</h1>;
+  return (
+    <header className="header">
+      <h1>Fast React Pizza Co.</h1>
+    </header>
+  );
 }
 
 function Menu() {
   return (
-    <div>
+    <div className="menu">
       <h2>Our Menu</h2>
       <Pizza />
     </div>
@@ -42,15 +59,20 @@ function Footer() {
   const closeHour = 22;
   const isOpened = hour >= openHour && hour <= closeHour;
 
+  const style = {
+    color: "#f00",
+  };
+
   return (
-    <footer>{new Date().toLocaleTimeString()}. We're currently open!</footer>
+    <footer>
+      <span style={style}>{new Date().toLocaleTimeString()}</span>. We're
+      currently open!
+    </footer>
   );
 }
 
 root.render(
   <StrictMode>
-    <Header />
-    <Menu />
-    <Footer />
+    <App />
   </StrictMode>
 );
