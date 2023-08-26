@@ -265,3 +265,9 @@ const booksAfterUpdate = booksAfterDelete.map((book) =>
     book.id === 1 ? { ...book, pages: 12 } : book
 );
 console.log(booksAfterUpdate);
+
+fetch("https://jsonplaceholder.typicode.com/posts")
+    .then((res) => res.json())
+    .then((data) => console.log(data));
+
+console.log("jonas");
