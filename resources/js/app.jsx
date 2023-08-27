@@ -20,15 +20,13 @@ function App() {
 }
 
 function Pizza(props) {
-  if (props.sold_out) return null;
-
   return (
-    <div className="pizza">
+    <div className={`pizza ${props.sold_out ? "sold-out" : ""}`}>
       <img src={props.photo_name} alt={props.name} />
       <div>
         <h3>{props.name}</h3>
         <p>{props.ingredients}</p>
-        <span>${props.price}</span>
+        <span>{props.sold_out ? "SOLD OUT" : props.price}</span>
       </div>
     </div>
   );
