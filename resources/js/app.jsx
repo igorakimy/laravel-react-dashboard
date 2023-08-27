@@ -56,20 +56,27 @@ function Menu() {
       <h2>Our Menu</h2>
 
       {pizzas.length > 0 ? (
-        <div className="pizzas">
-          {pizzas.map((pizza, i) => {
-            return (
-              <Pizza
-                key={i}
-                name={pizza.name}
-                photo_name={pizza.photo_name}
-                ingredients={pizza.ingredients}
-                price={pizza.price}
-                sold_out={pizza.sold_out}
-              />
-            );
-          })}
-        </div>
+        <>
+          <p>
+            Authentic Italian cuisine. 3 creative dishes to choose from. All
+            from our stone oven, all organic, all delicious.
+          </p>
+
+          <div className="pizzas">
+            {pizzas.map((pizza, i) => {
+              return (
+                <Pizza
+                  key={i}
+                  name={pizza.name}
+                  photo_name={pizza.photo_name}
+                  ingredients={pizza.ingredients}
+                  price={pizza.price}
+                  sold_out={pizza.sold_out}
+                />
+              );
+            })}
+          </div>
+        </>
       ) : (
         <p>We're still working on our menu. Please come back later :)</p>
       )}
