@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Data\Auth\UserData;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller
+class AuthController extends BaseApiController
 {
     public function register(RegisterRequest $request)
     {
@@ -42,7 +42,17 @@ class AuthController extends Controller
         $user  = auth()->user();
         $token = $user->createToken('main')->plainTextToken;
 
-        return response(compact('user', 'token'));
+        return response([
+            'user' => UserData::from($user),
+            'token' => $token,
+        ]);
+    }
+
+    public function user(Request $request)
+    {
+        $user = $request->user();
+
+        return response(UserData::from($user));
     }
 
     /**

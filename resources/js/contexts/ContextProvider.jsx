@@ -22,6 +22,18 @@ export const ContextProvider = ({ children }) => {
     }
   };
 
+  const can = (permissions) => {
+    if (!user || !user?.permissions) return false;
+
+    if (typeof permissions === "string") {
+      permissions = permissions.split(/[,;|]/).map((p) => p.trim());
+    }
+    if (Array.isArray(permissions)) {
+      return permissions.some((p) => user.permissions.includes(p));
+    }
+    return false;
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -29,6 +41,7 @@ export const ContextProvider = ({ children }) => {
         token,
         setUser,
         setToken,
+        can,
       }}
     >
       {children}

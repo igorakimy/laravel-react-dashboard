@@ -5,6 +5,7 @@ namespace App\Http\Requests\Api\User;
 use App\Data\User\UserStoreData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 use Spatie\LaravelData\WithData;
 
 class StoreUserRequest extends FormRequest
@@ -27,7 +28,11 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string',
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(1)
+            ],
         ];
     }
 }

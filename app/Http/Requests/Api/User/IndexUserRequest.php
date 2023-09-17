@@ -5,9 +5,8 @@ namespace App\Http\Requests\Api\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
-class UpdateUserRequest extends FormRequest
+class IndexUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,20 +24,15 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:55',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users', 'email')
-                    ->ignore($this->user->id)
+            'pagination' => 'array',
+            'pagination.current' => 'integer|required',
+            'pagination.pageSize' => 'integer|required',
+            'order' => [
+                'string',
+                'nullable',
+                Rule::in(['ascend', 'descend'])
             ],
-            'password' => [
-                'confirmed',
-                Password::min(8)
-                        ->letters()
-                        ->numbers()
-                        ->symbols()
-            ],
+            'field' => 'string|nullable',
         ];
     }
 }

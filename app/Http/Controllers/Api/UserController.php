@@ -4,22 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use App\Data\User\UserData;
 use App\Data\User\UserStoreData;
-use App\Http\Controllers\Controller;
+use App\Data\User\UserUpdateData;
+use App\Enums\Permission;
+use App\Http\Requests\Api\User\IndexUserRequest;
 use App\Http\Requests\Api\User\StoreUserRequest;
 use App\Http\Requests\Api\User\UpdateUserRequest;
 use App\Models\User;
-use Spatie\LaravelData\Exceptions\InvalidDataClass;
+use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends Controller
+class UserController extends BaseApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(IndexUserRequest $request)
     {
+        $page = $request->validated('pagination.current');
+        $perPage = $request->validated('pagination.pageSize');
+        $sortField = $request->validated('field', 'id');
+        $sortDirection = $request->validated('order', 'ascend') == 'ascend' ? 'asc' : 'desc';
+
         $users = User::query()
-                     ->orderBy('id', 'desc')
-                     ->paginate(10);
+                     ->orderBy($sortField, $sortDirection)
+                     ->paginate($perPage, ['*'], 'page', $page);
 
         return UserData::collection($users);
     }
@@ -31,7 +38,7 @@ class UserController extends Controller
     {
         $data = UserStoreData::fromRequest($request)->toArray();
         $user = User::query()->create($data);
-        return UserData::from($user);
+        return response(UserData::from($user), Response::HTTP_CREATED);
     }
 
     /**
@@ -39,7 +46,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return UserData::from($user);
     }
 
     /**
@@ -47,7 +54,12 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $data = UserUpdateData::fromRequest($request)
+            ->exceptWhen('password', fn(UserUpdateData $data) => $data->password == null)
+            ->toArray();
+
+        $user->update($data);
+        return UserData::from($user);
     }
 
     /**
@@ -55,6 +67,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return response(UserData::from($user), Response::HTTP_NO_CONTENT);
     }
 }
