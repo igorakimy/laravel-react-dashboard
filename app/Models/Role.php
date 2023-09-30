@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Models\Traits\HasPermissions;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Contracts\Role as RoleContract;
@@ -24,7 +26,7 @@ use Spatie\Permission\Traits\RefreshesPermissionCache;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class Role extends BaseModel implements RoleContract
+class Role extends Model implements RoleContract
 {
     use HasFactory;
     use HasPermissions;
@@ -32,6 +34,11 @@ class Role extends BaseModel implements RoleContract
 
     protected $guarded = [];
 
+    /**
+     * Constructor.
+     *
+     * @param  array  $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
@@ -41,12 +48,24 @@ class Role extends BaseModel implements RoleContract
         $this->guarded[] = $this->primaryKey;
     }
 
-    public function getTable()
+    /**
+     * Get the table name.
+     *
+     * @return Repository|Application|mixed|string
+     */
+    public function getTable(): mixed
     {
         return config('permission.table_names.roles', parent::getTable());
     }
 
-    public static function create(array $attributes = [])
+    /**
+     * Create new role.
+     *
+     * @param  array  $attributes
+     *
+     * @return Builder|EloquentModel
+     */
+    public static function create(array $attributes = []): EloquentModel|Builder
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
@@ -70,6 +89,8 @@ class Role extends BaseModel implements RoleContract
 
     /**
      * A role may be given various permissions.
+     *
+     * @return BelongsToMany
      */
     public function permissions(): BelongsToMany
     {
@@ -83,6 +104,8 @@ class Role extends BaseModel implements RoleContract
 
     /**
      * A role belongs to some users of the model associated with its guard.
+     *
+     * @return BelongsToMany
      */
     public function users(): BelongsToMany
     {
@@ -108,7 +131,11 @@ class Role extends BaseModel implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
+        /** @var RoleContract $role */
+        $role = static::findByParam([
+            'name' => $name,
+            'guard_name' => $guardName
+        ]);
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -129,7 +156,11 @@ class Role extends BaseModel implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::findByParam([(new static())->getKeyName() => $id, 'guard_name' => $guardName]);
+        /** @var RoleContract $role */
+        $role = static::findByParam([
+            (new static())->getKeyName() => $id,
+            'guard_name' => $guardName
+        ]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -150,28 +181,39 @@ class Role extends BaseModel implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
+        /** @var RoleContract $role */
+        $role = static::findByParam([
+            'name' => $name,
+            'guard_name' => $guardName
+        ]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (PermissionRegistrar::$teams ? [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : []));
+            return static::query()->create(
+                ['name' => $name, 'guard_name' => $guardName]
+                + (PermissionRegistrar::$teams ? [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : []));
         }
 
         return $role;
     }
 
     /**
+     * Find role by params.
+     *
      * @param  array  $params
      *
-     * @return Builder|Model|object|null
+     * @return Builder|EloquentModel|null
      */
-    protected static function findByParam(array $params = [])
+    protected static function findByParam(array $params = []): EloquentModel|Builder|null
     {
         $query = static::query();
 
         if (PermissionRegistrar::$teams) {
             $query->where(function ($q) use ($params) {
                 $q->whereNull(PermissionRegistrar::$teamsKey)
-                  ->orWhere(PermissionRegistrar::$teamsKey, $params[PermissionRegistrar::$teamsKey] ?? getPermissionsTeamId());
+                  ->orWhere(
+                      PermissionRegistrar::$teamsKey,
+                      $params[PermissionRegistrar::$teamsKey] ?? getPermissionsTeamId()
+                  );
             });
             unset($params[PermissionRegistrar::$teamsKey]);
         }

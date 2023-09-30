@@ -2,8 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\Permission;
-use App\Enums\Role;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -42,9 +41,11 @@ class PermissionMiddleware
             $permissions = [$permission];
         }
 
+        /** @var User $user */
+        $user = $authGuard->user();
+
         foreach ($permissions as $permission) {
-            if ($authGuard->user()->can(Permission::CAN_DO_ANYTHING->value)
-                || $authGuard->user()->can($permission, $guard)) {
+            if ($user->can($permission, $guard)) {
                 return $next($request);
             }
         }

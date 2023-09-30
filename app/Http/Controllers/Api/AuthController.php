@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Data\Auth\UserData;
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\User;
@@ -10,8 +11,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends BaseApiController
+final class AuthController extends ApiController
 {
+    /**
+     * User registration.
+     *
+     * @param  RegisterRequest  $request
+     *
+     * @return Response
+     */
     public function register(RegisterRequest $request)
     {
         $data = $request->validated();
@@ -28,6 +36,13 @@ class AuthController extends BaseApiController
         return response(compact('user', 'token'));
     }
 
+    /**
+     * User login.
+     *
+     * @param  LoginRequest  $request
+     *
+     * @return Response
+     */
     public function login(LoginRequest $request)
     {
         $data = $request->validated();
@@ -48,6 +63,13 @@ class AuthController extends BaseApiController
         ]);
     }
 
+    /**
+     * Get the current user.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
+     */
     public function user(Request $request)
     {
         $user = $request->user();

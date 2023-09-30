@@ -56,33 +56,32 @@ export default function UsersList() {
       width: 80,
       render: (_, render) => (
         <Space size="small">
-          {can("all|users.update") &&
-          <Tooltip placement="top" title="Edit">
-            <Button
-              size="small"
-              onClick={() => showUpdateUserForm(render.id)}
-              icon={<EditFilled style={{color: "#456cec"}}/>}
-            />
-          </Tooltip>
-          }
-          {can("all|users.destroy") &&
-            <Popconfirm
-            placement="topLeft"
-            title="Are you sure to delete this user"
-            onConfirm={() => handleUserDelete(render.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Tooltip placement="top" title="Delete">
+          {can("all|users.update") && (
+            <Tooltip placement="top" title="Edit">
               <Button
                 size="small"
-                icon={<DeleteFilled style={{color: "#ec4545"}}/>}
+                onClick={() => showUpdateUserForm(render.id)}
+                icon={<EditFilled style={{ color: "#456cec" }} />}
               />
             </Tooltip>
-          </Popconfirm>
-          }
+          )}
+          {can("all|users.destroy") && (
+            <Popconfirm
+              placement="topLeft"
+              title="Are you sure to delete this user"
+              onConfirm={() => handleUserDelete(render.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip placement="top" title="Delete">
+                <Button
+                  size="small"
+                  icon={<DeleteFilled style={{ color: "#ec4545" }} />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
-
       ),
     },
   ];
@@ -143,7 +142,7 @@ export default function UsersList() {
       .then(({ data }) => {
         setOpenCreateForm(false);
         getUsers();
-        showMessage("success", "User successfully created!")
+        showMessage("success", "User successfully created!");
       })
       .catch(({ response }) => {
         const err = response?.data?.errors;
@@ -152,57 +151,60 @@ export default function UsersList() {
         }
         const msg = response?.data?.message;
         if (msg && !err) {
-          showMessage("error", "Failed to сreate user: " + msg)
+          showMessage("error", "Failed to сreate user: " + msg);
         }
       });
   };
 
   const showUpdateUserForm = (userId) => {
-    axiosClient.get("/users/" + userId)
-      .then(({data}) => {
+    axiosClient
+      .get("/users/" + userId)
+      .then(({ data }) => {
         setUser(data);
         setOpenUpdateForm(true);
       })
-      .catch(({response}) => {
+      .catch(({ response }) => {
         showMessage("error", response?.data?.message);
-      })
-  }
+      });
+  };
 
   // Handle user updating.
   const handleUserUpdate = (userId, values) => {
     showLoadingMessage("Updating...");
 
-    axiosClient.put("/users/" + userId, values)
-      .then(({data}) => {
+    axiosClient
+      .put("/users/" + userId, values)
+      .then(({ data }) => {
         setOpenUpdateForm(false);
         getUsers();
-        showMessage("success", "User successfully updated!")
+        showMessage("success", "User successfully updated!");
       })
-      .catch(({response}) => {
+      .catch(({ response }) => {
         const err = response?.data?.errors;
         if (err) {
           setErrors(err);
         }
         const msg = response?.data?.message;
         if (msg && !err) {
-          showMessage("error", "Failed to update user: " + msg)
+          showMessage("error", "Failed to update user: " + msg);
         }
-      })
-  }
+      });
+  };
 
   // Handle user deleting.
   const handleUserDelete = (userId) => {
-    showLoadingMessage("Deleting...")
+    showLoadingMessage("Deleting...");
 
-    axiosClient.delete("/users/" + userId)
-      .then(({data}) => {
+    axiosClient
+      .delete("/users/" + userId)
+      .then(({ data }) => {
         getUsers();
         showMessage("success", "User successfully deleted!");
       })
-      .catch(({response}) => {
-        showMessage("error", "Failed to delete user: ")
-      })
-  }
+      .catch(({ response }) => {
+        showMessage("error", "Failed to delete user: ");
+      });
+  };
 
   const handleErrors = () => {
     setErrors(errors);
@@ -214,7 +216,7 @@ export default function UsersList() {
       type: "loading",
       content: content,
     });
-  }
+  };
 
   const showMessage = (type, content) => {
     messageApi.open({
@@ -222,14 +224,14 @@ export default function UsersList() {
       type: type,
       content: content,
     });
-  }
+  };
 
   return (
     <Card
       type="inner"
       title="Users"
       extra={
-        can("all|users.store") ? (
+        can("users.store") ? (
           <Button
             size="small"
             type="primary"

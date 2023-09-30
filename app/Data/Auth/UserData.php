@@ -12,6 +12,7 @@ final class UserData extends Data
         public string $name,
         public string $email,
         public array $permissions,
+        public bool $isSuperAdmin,
     ) {}
 
     public static function fromModel(User $user): self
@@ -21,6 +22,7 @@ final class UserData extends Data
             $user->name,
             $user->email,
             $user->getPermissionsViaRoles()->pluck('name')->toArray(),
+            $user->isSuperAdmin(),
         );
     }
 }

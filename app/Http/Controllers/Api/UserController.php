@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Data\User\UserData;
 use App\Data\User\UserStoreData;
 use App\Data\User\UserUpdateData;
-use App\Enums\Permission;
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\Api\User\IndexUserRequest;
 use App\Http\Requests\Api\User\StoreUserRequest;
 use App\Http\Requests\Api\User\UpdateUserRequest;
 use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends BaseApiController
+class UserController extends ApiController
 {
     /**
      * Display a listing of the resource.

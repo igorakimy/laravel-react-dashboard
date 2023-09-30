@@ -4,8 +4,6 @@ namespace App\Enums;
 
 enum Permission: string
 {
-    case CAN_DO_ANYTHING = 'all';
-
     case CAN_READ_USER = 'users.show';
     case CAN_CREATE_USER = 'users.store';
     case CAN_UPDATE_USER = 'users.update';
@@ -32,8 +30,6 @@ enum Permission: string
     public function name(): string
     {
         return match ($this) {
-            self::CAN_DO_ANYTHING => 'All',
-
             self::CAN_READ_USER => 'Read User',
             self::CAN_CREATE_USER => 'Create User',
             self::CAN_UPDATE_USER => 'Update User',
@@ -52,16 +48,6 @@ enum Permission: string
             self::CAN_DELETE_PERMISSION => 'Delete Permission',
             self::CAN_READ_LIST_PERMISSIONS => 'Read All Permissions',
         };
-    }
-
-    /**
-     * Get list of all cases.
-     *
-     * @return array
-     */
-    public static function list(): array
-    {
-        return self::cases();
     }
 }
 

@@ -2,25 +2,53 @@
 
 namespace App\Models\Traits;
 
+use App\Models\Permission;
+use App\Models\Role;
+use BackedEnum;
+use App\Enums\Role as RoleEnum;
+use App\Enums\Permission as PermissionEnum;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Traits\HasRoles as SpatieHasRoles;
 
 trait HasRoles
 {
-    use \Spatie\Permission\Traits\HasRoles {
+    use SpatieHasRoles {
         hasRole as protected spatieHasRole;
         assignRole as protected spatieAssignRole;
+        syncRoles as protected spatieSyncRoles;
+        hasPermissionTo as protected spatieHasPermissionTo;
+        hasPermissionViaRole as protected spatieHasPermissionViaRole;
+    }
+
+    /**
+     * Check if the user has any of the given roles
+     *
+     * @param array|Role|RoleEnum|Collection $roles
+     * @param  string|null  $guard
+     *
+     * @return bool
+     */
+    public function hasRole($roles, string $guard = null): bool
+    {
+        if (is_array($roles) || $roles instanceof Collection) {
+            $roles = $this->getFormattedRoles(...$roles);
+        } else {
+            $roles = $this->getFormattedRole($roles);
+        }
+
+        return $this->spatieHasRole($roles, $guard);
     }
 
     /**
      * Assign multiple roles to the user
      *
-     * @param ...$roles
+     * @param RoleEnum|Role|string $roles
      *
      * @return $this
      */
     public function assignRole(...$roles): static
     {
-        $roles = $this->getFormattedRolesCollection(...$roles);
+        $roles = $this->getFormattedRoles(...$roles);
 
         $this->spatieAssignRole(...$roles);
 
@@ -28,20 +56,64 @@ trait HasRoles
     }
 
     /**
-     * Check if the user has any of the given roles
+     * Detach all roles and attach new.
      *
-     * @param array|Collection $roles
-     * @param  string|null  $guard
+     * @param RoleEnum|Role|string $roles
+     *
+     * @return static
+     */
+    public function syncRoles(...$roles): static
+    {
+        $this->roles()->detach();
+
+        return $this->assignRole(...$roles);
+    }
+
+    /**
+     * Check if role has permission;
+     *
+     * @param PermissionEnum|Permission|string|int $permission
+     * @param $guardName
      *
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+    public function hasPermissionTo($permission, $guardName = null): bool
     {
-        if (is_array($roles)) {
-            $roles = $this->getFormattedRolesCollection(...$roles);
+        $permissionClass = $this->getPermissionClass();
+
+        if ($permission instanceof BackedEnum) {
+            $permission = $permissionClass->findByName(
+                $permission->value, $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
-        return $this->spatieHasRole($roles, $guard);
+        if (is_string($permission)) {
+            $permission = $permissionClass->findByName(
+                $permission, $guardName ?? $this->getDefaultGuardName()
+            );
+        }
+
+        if (is_int($permission)) {
+            $permission = $permissionClass->findById(
+                $permission, $guardName ?? $this->getDefaultGuardName()
+            );
+        }
+
+        return $this->hasDirectPermission($permission)
+               || $this->hasPermissionViaRole($permission);
+    }
+
+
+    /**
+     * Check has permission via role.
+     *
+     * @param  Permission  $permission
+     *
+     * @return bool
+     */
+    protected function hasPermissionViaRole(Permission $permission): bool
+    {
+        return $this->hasRole($permission->roles);
     }
 
     /**
@@ -51,14 +123,30 @@ trait HasRoles
      *
      * @return array
      */
-    protected function getFormattedRolesCollection(...$roles): array
+    protected function getFormattedRoles(...$roles): array
     {
         return collect($roles)->map(function ($role) {
-            if ($role instanceof \BackedEnum) {
-                return $role->value;
-            }
-
-            return $role;
+            return $this->getFormattedRole($role);
         })->toArray();
+    }
+
+    /**
+     * Get formatted role to string.
+     *
+     * @param $role
+     *
+     * @return string
+     */
+    protected function getFormattedRole($role): mixed
+    {
+        if ($role instanceof BackedEnum) {
+            return $role->value;
+        }
+
+        if ($role instanceof Role) {
+            return $role->name;
+        }
+
+        return $role;
     }
 }

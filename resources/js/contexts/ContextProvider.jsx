@@ -23,13 +23,16 @@ export const ContextProvider = ({ children }) => {
   };
 
   const can = (permissions) => {
-    if (!user || !user?.permissions) return false;
+    if (!user || !user.isSuperAdmin || !user?.permissions) return false;
 
     if (typeof permissions === "string") {
       permissions = permissions.split(/[,;|]/).map((p) => p.trim());
     }
     if (Array.isArray(permissions)) {
-      return permissions.some((p) => user.permissions.includes(p));
+      return (
+        user.isSuperAdmin ||
+        permissions.some((p) => user.permissions.includes(p))
+      );
     }
     return false;
   };

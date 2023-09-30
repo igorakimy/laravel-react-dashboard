@@ -15,20 +15,19 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * @throws Exception
      */
     public function run(): void
     {
-        // app()[PermissionRegistrar::class]->forgetCachedPermissions();
+         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $roles = RolesList::list();
-        $permissions = PermissionsList::list();
+        $roles = RolesList::cases();
+        $permissions = PermissionsList::cases();
 
         // create permissions
         foreach ($permissions as $permission) {
             Permission::create([
                 'name' => $permission->value,
-                'visible_name' => $permission->name(),
+                'display_name' => $permission->name(),
                 'guard_name' => 'api',
             ]);
         }
@@ -41,11 +40,14 @@ class UserSeeder extends Seeder
                 'name' => $role->value,
             ]);
             if ($role === RolesList::SUPER_ADMIN) {
-                $createdRole->givePermissionTo(PermissionsList::CAN_DO_ANYTHING);
+                $rolesList[] = $createdRole;
+                continue;
             } else {
                 $existRoles = [];
                 for ($i = 0; $i < 3; $i++) {
-                    $index = $this->generateRandomIndex(1, count($permissions) - 1, $existRoles);
+                    $index = count($permissions) > 1
+                        ? $this->generateRandomIndex(1, count($permissions) - 1, $existRoles)
+                        : 0;
                     $createdRole->givePermissionTo(
                         $permissions[$index]
                     );
@@ -55,10 +57,12 @@ class UserSeeder extends Seeder
             $rolesList[] = $createdRole;
         }
 
-        for($i = 0; $i < 3000; $i++) {
+        $usersAmount = 2000;
+
+        for($i = 0; $i < $usersAmount; $i++) {
             /** @var User $user */
             $user = User::factory(1)->create()->first();
-            $role = $rolesList[random_int(0, count($rolesList) - 1)];
+            $role = $rolesList[rand(0, count($rolesList) - 1)];
             $user->assignRole(RolesList::from($role->name));
         }
 
@@ -72,13 +76,12 @@ class UserSeeder extends Seeder
      * @param  array  $indexes
      *
      * @return int
-     * @throws Exception
      */
     private function generateRandomIndex(int $min, int $max, array $indexes): int
     {
-        $index = random_int($min, $max);
+        $index = rand($min, $max);
         while (in_array($index, $indexes)) {
-            $index = random_int($min, $max);
+            $index = rand($min, $max);
         }
 
         return $index;
