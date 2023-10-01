@@ -6,6 +6,7 @@ import UsersList from "./pages/users/UsersList.jsx";
 import Error404 from "./pages/errors/Error404.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import UserCreate from "./pages/users/UserCreate.jsx";
+import RolesList from "./pages/roles/RolesList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -21,9 +22,13 @@ const router = createBrowserRouter([
         element: <UsersList />,
       },
       {
-        path: "/users/create",
-        element: <UserCreate />,
+        path: "/roles",
+        element: <RolesList />,
       },
+      // {
+      //   path: "/users/create",
+      //   element: <UserCreate />,
+      // },
     ],
   },
 

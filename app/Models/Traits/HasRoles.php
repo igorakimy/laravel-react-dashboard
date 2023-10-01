@@ -58,7 +58,7 @@ trait HasRoles
     /**
      * Detach all roles and attach new.
      *
-     * @param RoleEnum|Role|string $roles
+     * @param RoleEnum|Role|string|int $roles
      *
      * @return static
      */

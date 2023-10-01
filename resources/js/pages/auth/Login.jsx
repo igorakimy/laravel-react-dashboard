@@ -8,7 +8,7 @@ import {
   Form,
   Input,
   Row,
-  Typography
+  Typography,
 } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -17,20 +17,20 @@ import { useStateContext } from "../../contexts/ContextProvider";
 import LogoIcon from "../../components/icons/LogoIcon";
 
 export default function Login() {
-  const { setUser, setToken } = useStateContext();
+  const { setCurrentUser, setToken } = useStateContext();
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
 
   const { Title } = Typography;
 
   const validationRules = {
-    "email": [
+    email: [
       {
         required: true,
         message: "Please input your Email",
       },
     ],
-    "password": [
+    password: [
       {
         required: true,
         message: "Please input your Password",
@@ -44,7 +44,7 @@ export default function Login() {
     axiosClient
       .post("/login", values)
       .then(({ data }) => {
-        setUser(data.user);
+        setCurrentUser(data.user);
         setToken(data.token);
       })
       .catch((err) => {
@@ -60,13 +60,15 @@ export default function Login() {
   };
 
   return (
-    <main style={{
-      backgroundImage: "url(./background.jpg)",
-      backgroundPosition: "0% 50%",
-      backgroundSize: "cover",
-      height: "100%",
-      }}>
-      <Row style={{backgroundColor: "rgb(51 51 51 / 83%)", height: "100%"}}>
+    <main
+      style={{
+        backgroundImage: "url(./background.jpg)",
+        backgroundPosition: "0% 50%",
+        backgroundSize: "cover",
+        height: "100%",
+      }}
+    >
+      <Row style={{ backgroundColor: "rgb(51 51 51 / 83%)", height: "100%" }}>
         <Col
           xs={{
             span: 22,
@@ -88,7 +90,6 @@ export default function Login() {
             marginTop: "2rem",
           }}
         >
-
           {message ? (
             <Alert
               message={
@@ -103,8 +104,8 @@ export default function Login() {
           ) : null}
 
           <Card>
-            <div style={{textAlign: "center"}}>
-               <LogoIcon style={{color: "#6e6e6e"}}/>
+            <div style={{ textAlign: "center" }}>
+              <LogoIcon style={{ color: "#6e6e6e" }} />
             </div>
 
             <Title level={4} style={{ textAlign: "center" }}>
@@ -119,20 +120,14 @@ export default function Login() {
               }}
               onFinish={handleSubmit}
             >
-              <Form.Item
-                name="email"
-                rules={validationRules.email}
-              >
+              <Form.Item name="email" rules={validationRules.email}>
                 <Input
                   prefix={<MailOutlined className="site-form-item-icon" />}
                   type="email"
                   placeholder="Email"
                 />
               </Form.Item>
-              <Form.Item
-                name="password"
-                rules={validationRules['password']}
-              >
+              <Form.Item name="password" rules={validationRules["password"]}>
                 <Input.Password
                   prefix={<LockOutlined className="site-form-item-icon" />}
                   placeholder="Password"
@@ -140,12 +135,12 @@ export default function Login() {
               </Form.Item>
               <Form.Item>
                 <Row>
-                  <Col xs={{span: 12}} sm={{span: 12}}>
+                  <Col xs={{ span: 12 }} sm={{ span: 12 }}>
                     <Form.Item name="remember" valuePropName="checked" noStyle>
                       <Checkbox>Remember me</Checkbox>
                     </Form.Item>
                   </Col>
-                  <Col xs={{span: 12}} sm={{span: 12}}>
+                  <Col xs={{ span: 12 }} sm={{ span: 12 }}>
                     <Link
                       className="login-form-forgot"
                       to="/users"

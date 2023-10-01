@@ -1,11 +1,36 @@
-import { Divider, Form, Input, Modal, Typography } from "antd";
-import { useState } from "react";
+import { Divider, Form, Input, Modal, Select, Typography } from "antd";
+import { useEffect, useState } from "react";
+import axiosClient from "../../axios-client.js";
 
 const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
   const [form] = Form.useForm();
   const [clientReady, setClientReady] = useState(true);
+  const [roles, setRoles] = useState([]);
 
   const { Title } = Typography;
+
+  useEffect(() => {
+    getRoles();
+  }, []);
+
+  const getRoles = () => {
+    axiosClient
+      .get("/roles?for_select=true")
+      .then(({ data }) => {
+        if (!data) return;
+        setRoles(
+          data.map((item) => {
+            return {
+              label: item.name,
+              value: item.id,
+            };
+          }),
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const sendForm = () => {
     form
@@ -28,6 +53,10 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
     });
   };
 
+  const handleSelectChange = (value) => {
+    console.log(value);
+  };
+
   return (
     <Modal
       maskClosable={false}
@@ -40,7 +69,7 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
       onCancel={onCancel}
       onOk={sendForm}
       style={{
-        top: 20
+        top: 20,
       }}
     >
       <Title level={4}>New User</Title>
@@ -58,16 +87,30 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
         }
       >
         <Form.Item
-          name="name"
-          label="Name"
+          name="first_name"
+          label="First Name"
           rules={[
             {
               required: true,
-              message: "Please input the name of user!",
+              message: "Please input the first name of user!",
             },
           ]}
-          validateStatus={errors.name ? "error" : null}
-          help={errors.name ? errors.name[0] : null}
+          validateStatus={errors.first_name ? "error" : null}
+          help={errors.first_name ? errors.first_name[0] : null}
+        >
+          <Input onChange={handleInputChange} />
+        </Form.Item>
+        <Form.Item
+          name="last_name"
+          label="Last Name"
+          rules={[
+            {
+              required: true,
+              message: "Please input the last name of user!",
+            },
+          ]}
+          validateStatus={errors.last_name ? "error" : null}
+          help={errors.last_name ? errors.last_name[0] : null}
         >
           <Input onChange={handleInputChange} />
         </Form.Item>
@@ -90,6 +133,26 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
           <Input onChange={handleInputChange} />
         </Form.Item>
         <Form.Item
+          name="roles"
+          label="Roles"
+          rules={[
+            {
+              required: true,
+              message: "Please select user role",
+              type: "array",
+            },
+          ]}
+          validateStatus={errors.roles ? "error" : null}
+          help={errors.roles ? errors.roles[0] : null}
+        >
+          <Select
+            showSearch
+            mode="multiple"
+            options={roles}
+            onChange={handleSelectChange}
+          />
+        </Form.Item>
+        <Form.Item
           name="password"
           label="Password"
           rules={[
@@ -101,7 +164,10 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
           validateStatus={errors.password ? "error" : null}
           help={errors.password ? errors.password[0] : null}
         >
-          <Input.Password autoComplete="new-password" onChange={handleInputChange} />
+          <Input.Password
+            autoComplete="new-password"
+            onChange={handleInputChange}
+          />
         </Form.Item>
 
         <Form.Item

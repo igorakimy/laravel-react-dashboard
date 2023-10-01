@@ -18,8 +18,9 @@ const SidebarMenu = () => {
 
   const items = [
     getItem("Dashboard", "1", "/", <RocketOutlined />),
-    getItem("Users", "2", "usersSubmenu", <TeamOutlined />, [
-      getItem("All users", "3", "/users"),
+    getItem("Access", "2", "usersSubmenu", <TeamOutlined />, [
+      getItem("Users", "3", "/users"),
+      getItem("Roles", "4", "/roles"),
     ]),
   ];
 

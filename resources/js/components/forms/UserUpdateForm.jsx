@@ -1,11 +1,32 @@
-import { Divider, Form, Input, Modal, Typography } from "antd";
+import { Divider, Form, Input, Modal, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
+import axiosClient from "../../axios-client.js";
 
-const UserUpdateForm = ({ open, user, onUpdate, onCancel, errors, onError }) => {
+const UserUpdateForm = ({
+  open,
+  user,
+  onUpdate,
+  onCancel,
+  errors,
+  onError,
+}) => {
   const [form] = Form.useForm();
   const [clientReady, setClientReady] = useState(true);
+  const [roles, setRoles] = useState([]);
 
   const { Title } = Typography;
+
+  form.setFieldValue(
+    "roles",
+    user.roles?.map((r) => {
+      return r.id;
+    }),
+  );
+
+  useEffect(() => {
+    form.setFieldsValue(user);
+    getRoles();
+  }, [user]);
 
   const sendForm = () => {
     form
@@ -13,13 +34,30 @@ const UserUpdateForm = ({ open, user, onUpdate, onCancel, errors, onError }) => 
       .then((values) => {
         onUpdate(user?.id, values);
         onError();
+
+        form.resetFields();
       })
       .catch((err) => {});
   };
 
-  useEffect(() => {
-    form.setFieldsValue(user);
-  })
+  const getRoles = () => {
+    axiosClient
+      .get("/roles?for_select=true")
+      .then(({ data }) => {
+        if (!data) return;
+        setRoles(
+          data.map((item) => {
+            return {
+              label: item.name,
+              value: item.id,
+            };
+          }),
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,17 +95,30 @@ const UserUpdateForm = ({ open, user, onUpdate, onCancel, errors, onError }) => 
         }
       >
         <Form.Item
-          name="name"
-          label="Name"
-          id="update_user_name"
+          name="first_name"
+          label="First Name"
           rules={[
             {
               required: true,
-              message: "Please input the name of user",
+              message: "Please input the first name of user!",
             },
           ]}
-          validateStatus={errors.name ? "error" : null}
-          help={errors.name ? errors.name[0] : null}
+          validateStatus={errors.first_name ? "error" : null}
+          help={errors.first_name ? errors.first_name[0] : null}
+        >
+          <Input onChange={handleInputChange} />
+        </Form.Item>
+        <Form.Item
+          name="last_name"
+          label="Last Name"
+          rules={[
+            {
+              required: true,
+              message: "Please input the last name of user!",
+            },
+          ]}
+          validateStatus={errors.last_name ? "error" : null}
+          help={errors.last_name ? errors.last_name[0] : null}
         >
           <Input onChange={handleInputChange} />
         </Form.Item>
@@ -91,6 +142,21 @@ const UserUpdateForm = ({ open, user, onUpdate, onCancel, errors, onError }) => 
           <Input onChange={handleInputChange} />
         </Form.Item>
         <Form.Item
+          name="roles"
+          label="Roles"
+          rules={[
+            {
+              required: true,
+              message: "Please select user role",
+              type: "array",
+            },
+          ]}
+          validateStatus={errors.roles ? "error" : null}
+          help={errors.roles ? errors.roles[0] : null}
+        >
+          <Select showSearch allowClear mode="multiple" options={roles} />
+        </Form.Item>
+        <Form.Item
           name="password"
           label="New Password"
           id="update_user_password"
@@ -99,8 +165,8 @@ const UserUpdateForm = ({ open, user, onUpdate, onCancel, errors, onError }) => 
         >
           <Input.Password onChange={handleInputChange} />
         </Form.Item>
-
         <Form.Item
+          fi
           name="password_confirmation"
           label="Password Confirm"
           id="update_user_password_confirm"

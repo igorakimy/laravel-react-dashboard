@@ -7,7 +7,6 @@ use App\Enums\Role as RolesList;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use Exception;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -28,7 +27,7 @@ class UserSeeder extends Seeder
             Permission::create([
                 'name' => $permission->value,
                 'display_name' => $permission->name(),
-                'guard_name' => 'api',
+                'guard_name' => 'web',
             ]);
         }
 
@@ -59,6 +58,7 @@ class UserSeeder extends Seeder
 
         $usersAmount = 2000;
 
+        // create users.
         for($i = 0; $i < $usersAmount; $i++) {
             /** @var User $user */
             $user = User::factory(1)->create()->first();

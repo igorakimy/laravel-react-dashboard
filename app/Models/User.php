@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Enums\Role;
 use App\Models\Traits\HasRoles;
+use App\ValueObjects\FullName;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -63,7 +65,8 @@ class User extends Model implements
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
@@ -86,7 +89,31 @@ class User extends Model implements
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'full_name' => FullName::class
     ];
+
+    // ==================== //
+    //      ATTRIBUTES      //
+    // ==================== //
+
+    /**
+     * Full name of user.
+     *
+     * @return Attribute
+     */
+    public function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string|null $value, array $attributes) => new FullName(
+                $attributes['first_name'],
+                $attributes['last_name']
+            )
+        );
+    }
+
+    // ======================= //
+    //      OTHER METHODS      //
+    // ======================= //
 
     /**
      * Check if user is Super Admin.

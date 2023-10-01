@@ -95,9 +95,9 @@ trait HasPermissions
      *
      * @param $permission
      *
-     * @return int|string
+     * @return int|string|array
      */
-    private function getFormattedPermission($permission): int|string
+    private function getFormattedPermission($permission): int|string|array
     {
         if ($permission instanceof BackedEnum) {
             return $permission->value;

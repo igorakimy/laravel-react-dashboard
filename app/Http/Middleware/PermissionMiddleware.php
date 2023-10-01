@@ -35,7 +35,7 @@ class PermissionMiddleware
                 : explode('|', $permission);
         }
 
-        if ( is_null($permission) ) {
+        if (is_null($permission)) {
             $permission = $request->route()->getName();
 
             $permissions = [$permission];

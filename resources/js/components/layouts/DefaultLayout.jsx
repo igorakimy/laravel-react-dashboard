@@ -1,7 +1,4 @@
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Layout, theme } from "antd";
 import { useEffect, useState } from "react";
 import { Link, Navigate, Outlet } from "react-router-dom";
@@ -12,59 +9,17 @@ import SidebarMenu from "../SidebarMenu.jsx";
 import UserDropdown from "../UserDropdown.jsx";
 import LogoIcon from "../icons/LogoIcon.jsx";
 
-// const drawerWidth = 260;
-//
-// const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-//   ({ theme, open }) => ({
-//     flexGrow: 1,
-//     padding: theme.spacing(3),
-//     transition: theme.transitions.create("margin", {
-//       easing: theme.transitions.easing.sharp,
-//       duration: theme.transitions.duration.leavingScreen,
-//     }),
-//     marginLeft: `-${drawerWidth}px`,
-//     ...(open && {
-//       transition: theme.transitions.create("margin", {
-//         easing: theme.transitions.easing.easeOut,
-//         duration: theme.transitions.duration.enteringScreen,
-//       }),
-//       marginLeft: 0,
-//     }),
-//   }),
-// );
-//
-// const AppBar = styled(MuiAppBar, {
-//   shouldForwardProp: (prop) => prop !== "open",
-// })(({ theme, open }) => ({
-//   transition: theme.transitions.create(["margin", "width"], {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.leavingScreen,
-//   }),
-//   ...(open && {
-//     width: `calc(100% - ${drawerWidth}px)`,
-//     marginLeft: `${drawerWidth}px`,
-//     transition: theme.transitions.create(["margin", "width"], {
-//       easing: theme.transitions.easing.easeOut,
-//       duration: theme.transitions.duration.enteringScreen,
-//     }),
-//   }),
-// }));
-//
-// const DrawerHeader = styled("div")(({ theme }) => ({
-//   display: "flex",
-//   alignItems: "center",
-//   padding: theme.spacing(0, 1),
-//   ...theme.mixins.toolbar,
-//   justifyContent: "flex-end",
-// }));
-
 export default function DefaultLayout() {
-  const { user, token, setUser, setToken } = useStateContext();
+  const { currentUser, token, setCurrentUser, setToken } = useStateContext();
   const [open, setOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
 
   const { Header, Sider, Content, Footer } = Layout;
+
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
 
   const {
     token: { colorBgContainer },
@@ -90,16 +45,16 @@ export default function DefaultLayout() {
     event.preventDefault();
 
     axiosClient.post("/logout").then((resp) => {
-      setUser(null);
+      setCurrentUser(null);
       setToken(null);
     });
   };
 
-  useEffect(() => {
+  const getCurrentUser = () => {
     axiosClient.get("/user").then(({ data }) => {
-      setUser(data);
+      setCurrentUser(data);
     });
-  }, []);
+  };
 
   if (!token) {
     return <Navigate to="/login" />;
@@ -128,7 +83,7 @@ export default function DefaultLayout() {
           }}
         >
           <Link to="/">
-            <LogoIcon style={{color: "#ffeb00"}} />
+            <LogoIcon style={{ color: "#ffeb00" }} />
           </Link>
         </div>
 

@@ -2,43 +2,62 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Data\User\UserData;
+use App\Actions\Api\User\DeleteUser;
+use App\Actions\Api\User\FetchPaginatedUsers;
+use App\Actions\Api\User\ShowUser;
+use App\Actions\Api\User\StoreUser;
+use App\Actions\Api\User\UpdateUser;
+use App\Data\User\UserPaginationData;
 use App\Data\User\UserStoreData;
 use App\Data\User\UserUpdateData;
 use App\Http\Controllers\ApiController;
-use App\Http\Requests\Api\User\IndexUserRequest;
-use App\Http\Requests\Api\User\StoreUserRequest;
-use App\Http\Requests\Api\User\UpdateUserRequest;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as RespCode;
 
 class UserController extends ApiController
 {
+    public function __construct(
+        private readonly FetchPaginatedUsers $fetchPaginatedUsersAction,
+        private readonly ShowUser $showUserAction,
+        private readonly StoreUser $storeUserAction,
+        private readonly UpdateUser $updateUserAction,
+        private readonly DeleteUser $deleteUserAction,
+    ) {
+    }
+
     /**
      * Display a listing of the resource.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
      */
-    public function index(IndexUserRequest $request)
+    public function index(Request $request)
     {
-        $page = $request->validated('pagination.current');
-        $perPage = $request->validated('pagination.pageSize');
-        $sortField = $request->validated('field', 'id');
-        $sortDirection = $request->validated('order', 'ascend') == 'ascend' ? 'asc' : 'desc';
+        $data = UserPaginationData::fromRequest($request);
 
-        $users = User::query()
-                     ->orderBy($sortField, $sortDirection)
-                     ->paginate($perPage, ['*'], 'page', $page);
+        $users = $this->fetchPaginatedUsersAction->handle($data);
 
-        return UserData::collection($users);
+        return response($users);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
      */
-    public function store(StoreUserRequest $request)
+    public function store(Request $request)
     {
-        $data = UserStoreData::fromRequest($request)->toArray();
-        $user = User::query()->create($data);
-        return response(UserData::from($user), Response::HTTP_CREATED);
+        $data = UserStoreData::fromRequest($request);
+
+        $userData = $this->storeUserAction->handle($data);
+
+        return response($userData, RespCode::HTTP_CREATED);
     }
 
     /**
@@ -46,20 +65,21 @@ class UserController extends ApiController
      */
     public function show(User $user)
     {
-        return UserData::from($user);
+        $userData = $this->showUserAction->handle($user);
+        return response($userData);
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Exception
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(Request $request, User $user)
     {
-        $data = UserUpdateData::fromRequest($request)
-            ->exceptWhen('password', fn(UserUpdateData $data) => $data->password == null)
-            ->toArray();
+        $data = UserUpdateData::fromRequest($request);
 
-        $user->update($data);
-        return UserData::from($user);
+        $userData = $this->updateUserAction->handle($user, $data);
+
+        return response($userData);
     }
 
     /**
@@ -67,7 +87,8 @@ class UserController extends ApiController
      */
     public function destroy(User $user)
     {
-        $user->delete();
-        return response(UserData::from($user), Response::HTTP_NO_CONTENT);
+        $userData = $this->deleteUserAction->handle($user);
+
+        return response($userData, RespCode::HTTP_NO_CONTENT);
     }
 }

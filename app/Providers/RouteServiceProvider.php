@@ -20,12 +20,19 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/home';
 
     /**
+     * Limit the number of requests per minute.
+     *
+     * @var int
+     */
+    public const REQUEST_LIMIT = 500;
+
+    /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(self::REQUEST_LIMIT)->by($request->user()?->id ?: $request->ip());
         });
 
         $this->routes(function () {

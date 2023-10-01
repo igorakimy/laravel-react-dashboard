@@ -1,5 +1,14 @@
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
-import { Button, Card, Popconfirm, Space, Table, Tooltip, message } from "antd";
+import {
+  Button,
+  Card,
+  Popconfirm,
+  Space,
+  Table,
+  Tooltip,
+  message,
+  Tag,
+} from "antd";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios-client.js";
 import UserCreateForm from "../../components/forms/UserCreateForm.jsx";
@@ -7,7 +16,7 @@ import UserUpdateForm from "../../components/forms/UserUpdateForm.jsx";
 import { useStateContext } from "../../contexts/ContextProvider.jsx";
 
 export default function UsersList() {
-  const { can } = useStateContext();
+  const { can, currentUser } = useStateContext();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [users, setUsers] = useState([]);
@@ -24,39 +33,68 @@ export default function UsersList() {
     },
   });
 
+  useEffect(() => {
+    getUsers();
+  }, [JSON.stringify(tableParams)]);
+
   const getColumns = () => [
     {
       title: "ID",
       dataIndex: "id",
       sorter: true,
+      width: 80,
     },
     {
       title: "Name",
       dataIndex: "name",
       sorter: true,
+      render: (_, render) => {
+        return render.full_name;
+      },
+      width: 243,
     },
     {
       title: "Email",
       dataIndex: "email",
       sorter: true,
+      width: 243,
+    },
+    {
+      title: "Roles",
+      dataIndex: "roles",
+      sorter: true,
+      width: 243,
+      render: (_, { roles }) => (
+        <Space size={[0, 8]} wrap>
+          {roles.map((role) => {
+            return (
+              <Tag color="success" key={role.name}>
+                {role.name.toLowerCase()}
+              </Tag>
+            );
+          })}
+        </Space>
+      ),
     },
     {
       title: "Created At",
       dataIndex: "created_at",
       sorter: true,
+      width: 243,
     },
     {
       title: "Updated At",
       dataIndex: "updated_at",
       sorter: true,
+      width: 243,
     },
     {
       title: "Actions",
       align: "center",
-      width: 80,
+      width: 90,
       render: (_, render) => (
         <Space size="small">
-          {can("all|users.update") && (
+          {can("users.update") && (
             <Tooltip placement="top" title="Edit">
               <Button
                 size="small"
@@ -65,7 +103,7 @@ export default function UsersList() {
               />
             </Tooltip>
           )}
-          {can("all|users.destroy") && (
+          {can("users.destroy") && currentUser.id !== render.id && (
             <Popconfirm
               placement="topLeft"
               title="Are you sure to delete this user"
@@ -85,10 +123,6 @@ export default function UsersList() {
       ),
     },
   ];
-
-  useEffect(() => {
-    getUsers();
-  }, [JSON.stringify(tableParams)]);
 
   const getUsers = () => {
     setLoading(true);
@@ -110,7 +144,6 @@ export default function UsersList() {
               `${range[0]}-${range[1]} of ${total} items`,
           },
         });
-        // console.log(data);
       })
       .catch((err) => {
         setLoading(false);
@@ -247,13 +280,18 @@ export default function UsersList() {
       {contextHolder}
 
       <Table
+        rowSelection={{
+          type: "checkbox",
+          columnWidth: 32,
+        }}
         columns={getColumns()}
         rowKey={(record) => record.id}
         dataSource={users}
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
-        scroll={{ y: 450, x: 500 }}
+        virtual
+        scroll={{ y: 450, x: "max-content" }}
         size="small"
       />
 

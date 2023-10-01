@@ -1,14 +1,14 @@
 import { createContext, useContext, useState } from "react";
 
 const StateContext = createContext({
-  user: null,
+  currentUser: null,
   token: null,
-  setUser: () => {},
+  setCurrentUser: () => {},
   setToken: () => {},
 });
 
 export const ContextProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [currentUser, setCurrentUser] = useState();
   const [token, _setToken] = useState(localStorage.getItem("ACCESS_TOKEN"));
 
   const setToken = (token) => {
@@ -23,15 +23,19 @@ export const ContextProvider = ({ children }) => {
   };
 
   const can = (permissions) => {
-    if (!user || !user.isSuperAdmin || !user?.permissions) return false;
+    if (
+      !currentUser ||
+      (!currentUser?.permissions && !currentUser.isSuperAdmin)
+    )
+      return false;
 
     if (typeof permissions === "string") {
       permissions = permissions.split(/[,;|]/).map((p) => p.trim());
     }
     if (Array.isArray(permissions)) {
       return (
-        user.isSuperAdmin ||
-        permissions.some((p) => user.permissions.includes(p))
+        currentUser.isSuperAdmin ||
+        permissions.some((p) => currentUser.permissions.includes(p))
       );
     }
     return false;
@@ -40,9 +44,9 @@ export const ContextProvider = ({ children }) => {
   return (
     <StateContext.Provider
       value={{
-        user,
+        currentUser,
+        setCurrentUser,
         token,
-        setUser,
         setToken,
         can,
       }}
