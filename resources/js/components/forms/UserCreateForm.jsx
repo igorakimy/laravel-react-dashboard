@@ -6,11 +6,13 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
   const [form] = Form.useForm();
   const [clientReady, setClientReady] = useState(true);
   const [roles, setRoles] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
   const { Title } = Typography;
 
   useEffect(() => {
     getRoles();
+    getStatuses();
   }, []);
 
   const getRoles = () => {
@@ -21,7 +23,7 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
         setRoles(
           data.map((item) => {
             return {
-              label: item.name,
+              label: item.name.charAt(0).toUpperCase() + item.name.slice(1),
               value: item.id,
             };
           }),
@@ -32,15 +34,28 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
       });
   };
 
+  const getStatuses = () => {
+    axiosClient
+      .get("/statuses")
+      .then(({ data }) => {
+        setStatuses(
+          data.map((s) => {
+            return {
+              label: s,
+              value: s,
+            };
+          }),
+        );
+      })
+      .catch((err) => {});
+  };
+
   const sendForm = () => {
     form
       .validateFields()
       .then((values) => {
         onCreate(values);
         onError();
-
-        console.log(errors, Object.keys(errors).length);
-        // form.resetFields();
       })
       .catch((err) => {});
   };
@@ -51,10 +66,6 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
       [name]: value,
       errors: [],
     });
-  };
-
-  const handleSelectChange = (value) => {
-    console.log(value);
   };
 
   return (
@@ -120,11 +131,11 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
           rules={[
             {
               required: true,
-              message: "Please input the email of user!",
+              message: "Please input the email of user",
             },
             {
               type: "email",
-              message: "The input is not valid E-mail!",
+              message: "The input is not valid email",
             },
           ]}
           validateStatus={errors.email ? "error" : null}
@@ -145,12 +156,21 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
           validateStatus={errors.roles ? "error" : null}
           help={errors.roles ? errors.roles[0] : null}
         >
-          <Select
-            showSearch
-            mode="multiple"
-            options={roles}
-            onChange={handleSelectChange}
-          />
+          <Select showSearch mode="multiple" options={roles} />
+        </Form.Item>
+        <Form.Item
+          name="status"
+          label="Status"
+          rules={[
+            {
+              required: true,
+              message: "Please set the user status",
+            },
+          ]}
+          validateStatus={errors.status ? "error" : null}
+          help={errors.status ? errors.status[0] : null}
+        >
+          <Select options={statuses} />
         </Form.Item>
         <Form.Item
           name="password"

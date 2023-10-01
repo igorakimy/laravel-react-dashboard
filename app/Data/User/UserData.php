@@ -3,8 +3,8 @@
 namespace App\Data\User;
 
 use App\Data\Role\RoleData;
+use App\Enums\UserStatus;
 use App\Models\User;
-use App\ValueObjects\FullName;
 use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -20,6 +20,7 @@ class UserData extends Data
         public string $last_name,
         public string $full_name,
         public string $email,
+        public UserStatus $status,
 
         #[DataCollectionOf(RoleData::class)]
         public DataCollection $roles,
@@ -39,6 +40,7 @@ class UserData extends Data
             $user->last_name,
             $user->full_name->toString(),
             $user->email,
+            $user->status,
             RoleData::collection($user->roles),
             $user->created_at,
             $user->updated_at,

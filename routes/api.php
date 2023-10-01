@@ -42,8 +42,13 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
 });
 
 /*
- * Guest routes.
+ * Guest auth routes.
  */
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+/**
+ * Guest user routes.
+ */
+Route::get('/statuses', [UserController::class, 'showStatuses']);
 

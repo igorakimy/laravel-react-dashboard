@@ -51,13 +51,11 @@ export default function UsersList() {
       render: (_, render) => {
         return render.full_name;
       },
-      width: 243,
     },
     {
       title: "Email",
       dataIndex: "email",
       sorter: true,
-      width: 243,
     },
     {
       title: "Roles",
@@ -68,7 +66,7 @@ export default function UsersList() {
         <Space size={[0, 8]} wrap>
           {roles.map((role) => {
             return (
-              <Tag color="success" key={role.name}>
+              <Tag color="blue" key={role.name}>
                 {role.name.toLowerCase()}
               </Tag>
             );
@@ -77,16 +75,24 @@ export default function UsersList() {
       ),
     },
     {
+      title: "Status",
+      dataIndex: "status",
+      sorter: true,
+      render: (_, render) => (
+        <Tag color={render.status === "active" ? "green" : "red"}>
+          {render.status}
+        </Tag>
+      ),
+    },
+    {
       title: "Created At",
       dataIndex: "created_at",
       sorter: true,
-      width: 243,
     },
     {
       title: "Updated At",
       dataIndex: "updated_at",
       sorter: true,
-      width: 243,
     },
     {
       title: "Actions",
@@ -290,7 +296,7 @@ export default function UsersList() {
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
-        virtual
+        // virtual
         scroll={{ y: 450, x: "max-content" }}
         size="small"
       />

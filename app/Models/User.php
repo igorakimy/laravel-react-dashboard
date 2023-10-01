@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Role;
+use App\Enums\UserStatus;
 use App\Models\Traits\HasRoles;
 use App\ValueObjects\FullName;
 use Illuminate\Auth\Authenticatable;
@@ -44,6 +45,19 @@ use App\Enums\Role as RoleEnum;
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @property string|null $first_name
+ * @property string|null $last_name
+ * @property UserStatus $status
+ * @property FullName $full_name
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read int|null $roles_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|User role($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
  * @mixin \Eloquent
  */
 class User extends Model implements
@@ -69,6 +83,7 @@ class User extends Model implements
         'last_name',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -89,12 +104,13 @@ class User extends Model implements
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'full_name' => FullName::class
+        'full_name' => FullName::class,
+        'status' => UserStatus::class,
     ];
 
-    // ==================== //
-    //      ATTRIBUTES      //
-    // ==================== //
+    // ============================== //
+    //      ACCESSORS & MUTATORS      //
+    // ============================== //
 
     /**
      * Full name of user.

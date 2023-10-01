@@ -13,6 +13,7 @@ const UserUpdateForm = ({
   const [form] = Form.useForm();
   const [clientReady, setClientReady] = useState(true);
   const [roles, setRoles] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
   const { Title } = Typography;
 
@@ -23,9 +24,15 @@ const UserUpdateForm = ({
     }),
   );
 
+  // form.setFieldValue(
+  //   'status',
+  //   user.status
+  // );
+
   useEffect(() => {
     form.setFieldsValue(user);
     getRoles();
+    getStatuses();
   }, [user]);
 
   const sendForm = () => {
@@ -35,7 +42,23 @@ const UserUpdateForm = ({
         onUpdate(user?.id, values);
         onError();
 
-        form.resetFields();
+        setTimeout(form.resetFields, 500);
+      })
+      .catch((err) => {});
+  };
+
+  const getStatuses = () => {
+    axiosClient
+      .get("/statuses")
+      .then(({ data }) => {
+        setStatuses(
+          data.map((s) => {
+            return {
+              label: s,
+              value: s,
+            };
+          }),
+        );
       })
       .catch((err) => {});
   };
@@ -155,6 +178,20 @@ const UserUpdateForm = ({
           help={errors.roles ? errors.roles[0] : null}
         >
           <Select showSearch allowClear mode="multiple" options={roles} />
+        </Form.Item>
+        <Form.Item
+          name="status"
+          label="Status"
+          rules={[
+            {
+              required: true,
+              message: "Please select user status",
+            },
+          ]}
+          validateStatus={errors.status ? "error" : null}
+          help={errors.status ? errors.status[0] : null}
+        >
+          <Select options={statuses} />
         </Form.Item>
         <Form.Item
           name="password"

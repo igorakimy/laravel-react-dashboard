@@ -10,6 +10,7 @@ use App\Actions\Api\User\UpdateUser;
 use App\Data\User\UserPaginationData;
 use App\Data\User\UserStoreData;
 use App\Data\User\UserUpdateData;
+use App\Enums\UserStatus;
 use App\Http\Controllers\ApiController;
 use App\Models\User;
 use Exception;
@@ -90,5 +91,15 @@ class UserController extends ApiController
         $userData = $this->deleteUserAction->handle($user);
 
         return response($userData, RespCode::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Get available user statuses.
+     *
+     * @return Response
+     */
+    public function showStatuses()
+    {
+        return response(UserStatus::toArray());
     }
 }

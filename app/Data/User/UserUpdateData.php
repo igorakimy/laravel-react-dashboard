@@ -4,9 +4,11 @@ namespace App\Data\User;
 
 use App\Data\Role\RoleData;
 use App\Data\Transformers\HashableTransformer;
+use App\Enums\UserStatus;
 use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Password;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Unique;
@@ -21,6 +23,7 @@ class UserUpdateData extends Data
         public string $first_name,
         public string $last_name,
         public string $email,
+        public UserStatus $status,
 
         #[WithTransformer(HashableTransformer::class)]
         public ?string $password,
@@ -43,6 +46,7 @@ class UserUpdateData extends Data
             first_name: $request->input('first_name'),
             last_name: $request->input('last_name'),
             email: $request->input('email'),
+            status: UserStatus::from($request->input('status')),
             password: $request->input('password'),
             roles: RoleData::collection(
                 Role::query()
@@ -61,6 +65,7 @@ class UserUpdateData extends Data
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
+            'status' => ['required', new Enum(UserStatus::class)],
             'email' => [
                 'required',
                 'email',
