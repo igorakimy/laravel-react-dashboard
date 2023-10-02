@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,11 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Auth routes.
      */
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    /*
+     * Products routes.
+     */
+    Route::apiResource('/products', ProductController::class);
 });
 
 /*

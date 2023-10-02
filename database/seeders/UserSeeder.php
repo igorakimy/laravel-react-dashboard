@@ -56,7 +56,7 @@ class UserSeeder extends Seeder
             $rolesList[] = $createdRole;
         }
 
-        $usersAmount = 2000;
+        $usersAmount = 20;
 
         // create users.
         for($i = 0; $i < $usersAmount; $i++) {
