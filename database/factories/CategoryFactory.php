@@ -17,10 +17,8 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->unique()->words(rand(2, 3), true);
-
         return [
-            'name' => $name,
+            'name' => $this->faker->unique()->words(rand(1, 2), true),
             'description' => $this->faker->sentence(),
             'parent_id' => $this->faker->randomElement([
                 Category::factory(),

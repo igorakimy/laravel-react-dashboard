@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Color;
 use App\Models\Material;
 use App\Models\Type;
@@ -20,12 +19,16 @@ return new class extends Migration {
             $table->string('name', 255);
             $table->string('sku')->unique();
 
-            $table->unsignedDecimal('width')->nullable();
-            $table->unsignedDecimal('height')->nullable();
-            $table->unsignedDecimal('weight')->nullable();
+            $table->unsignedInteger('quantity')->default(0);
 
             $table->unsignedDecimal('cost_price')->nullable();
             $table->unsignedDecimal('selling_price')->nullable();
+
+            $table->unsignedDecimal('margin')->nullable();
+
+            $table->unsignedDecimal('width')->nullable();
+            $table->unsignedDecimal('height')->nullable();
+            $table->unsignedDecimal('weight')->nullable();
 
             $table->string('barcode', 100)->index()->nullable();
             $table->string('location', 255)->nullable();

@@ -25,11 +25,13 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->words(rand(1, 3), true),
             'sku' => $this->faker->unique()->uuid(),
+            'quantity' => $this->faker->randomDigit(),
             'width' => $this->faker->randomFloat(2, 10, 1000),
             'height' => $this->faker->randomFloat(2, 10, 1000),
             'weight' => $this->faker->randomFloat(2, 10, 1000),
             'cost_price' => $this->faker->randomFloat(2, 10, 9999),
             'selling_price' => $this->faker->randomFloat(2, 10, 9999),
+            'margin' => $this->faker->randomFloat(2, 10, 100),
             'barcode' => (string)$this->faker->randomNumber(9, true),
             'location' => $this->faker->address(),
             'color_id' => Color::query()->inRandomOrder()->first()?->id,

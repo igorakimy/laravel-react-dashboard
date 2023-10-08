@@ -1,10 +1,15 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VendorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +45,31 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Auth routes.
      */
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    /*
+     * Categories routes.
+     */
+    Route::apiResource('/categories', CategoryController::class)->only('index');
+
+    /*
+     * Colors routes.
+     */
+    Route::apiResource('/colors', ColorController::class)->only('index');
+
+    /*
+     * Materials routes.
+     */
+    Route::apiResource('/materials', MaterialController::class)->only('index');
+
+    /*
+     * Vendors routes.
+     */
+    Route::apiResource('/vendors', VendorController::class)->only('index');
+
+    /*
+     * Types routes.
+     */
+    Route::apiResource('/types', TypeController::class)->only('index');
 
     /*
      * Products routes.

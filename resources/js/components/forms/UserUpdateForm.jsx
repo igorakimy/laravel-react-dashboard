@@ -102,7 +102,7 @@ const UserUpdateForm = ({
         top: 20,
       }}
     >
-      <Title level={4}>Edit User "{user.name}"</Title>
+      <Title level={4}>Edit User "{user.full_name}"</Title>
       <Divider style={{ margin: "0.6rem 0" }}></Divider>
       <Form
         labelCol={{ span: 8 }}
@@ -203,7 +203,6 @@ const UserUpdateForm = ({
           <Input.Password onChange={handleInputChange} />
         </Form.Item>
         <Form.Item
-          fi
           name="password_confirmation"
           label="Password Confirm"
           id="update_user_password_confirm"

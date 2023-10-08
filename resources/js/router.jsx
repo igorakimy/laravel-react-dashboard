@@ -5,8 +5,8 @@ import Login from "./pages/auth/Login.jsx";
 import UsersList from "./pages/users/UsersList.jsx";
 import Error404 from "./pages/errors/Error404.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import UserCreate from "./pages/users/UserCreate.jsx";
 import RolesList from "./pages/roles/RolesList.jsx";
+import ProductsList from "./pages/products/ProductsList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,10 +25,10 @@ const router = createBrowserRouter([
         path: "/roles",
         element: <RolesList />,
       },
-      // {
-      //   path: "/users/create",
-      //   element: <UserCreate />,
-      // },
+      {
+        path: "/products",
+        element: <ProductsList />,
+      },
     ],
   },
 

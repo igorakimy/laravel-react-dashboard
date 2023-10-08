@@ -18,8 +18,10 @@
         "@mui/material": "^5.14.7",
         "@vitejs/plugin-react": "^4.0.4",
         "antd": "^5.9.0",
+        "qs": "^6.11.2",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-highlight-words": "^0.20.0",
         "react-router-dom": "^6.15.0"
     }
 }

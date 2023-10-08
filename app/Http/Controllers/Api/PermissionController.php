@@ -16,7 +16,7 @@ final class PermissionController extends ApiController
         return PermissionData::collection($permissions);
     }
 
-    public function show(Request $request, Permission $role)
+    public function show(Request $request, Permission $permission)
     {
 
     }
@@ -26,12 +26,12 @@ final class PermissionController extends ApiController
 
     }
 
-    public function update(Request $request, Permission $role)
+    public function update(Request $request, Permission $permission)
     {
 
     }
 
-    public function destroy(Permission $role)
+    public function destroy(Permission $permission)
     {
 
     }
