@@ -49,7 +49,7 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     /*
      * Categories routes.
      */
-    Route::apiResource('/categories', CategoryController::class)->only('index');
+    Route::apiResource('/categories', CategoryController::class);
 
     /*
      * Colors routes.

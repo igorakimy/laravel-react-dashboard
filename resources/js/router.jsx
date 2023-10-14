@@ -7,6 +7,7 @@ import Error404 from "./pages/errors/Error404.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import RolesList from "./pages/roles/RolesList.jsx";
 import ProductsList from "./pages/products/ProductsList.jsx";
+import CategoriesList from "./pages/categories/CategoriesList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/products",
         element: <ProductsList />,
+      },
+      {
+        path: "/categories",
+        element: <CategoriesList />,
       },
     ],
   },

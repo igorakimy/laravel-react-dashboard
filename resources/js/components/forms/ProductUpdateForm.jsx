@@ -218,7 +218,7 @@ const ProductUpdateForm = ({
 
   const getCategories = () => {
     axiosClient
-      .get("/categories")
+      .get("/categories?for_select=true")
       .then(({ data }) => {
         setCategories(
           data.map((item) => {

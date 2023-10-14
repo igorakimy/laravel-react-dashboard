@@ -2,9 +2,10 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu } from "antd";
 import {
-  RocketOutlined,
   TeamOutlined,
   ShoppingOutlined,
+  DashboardOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 
 const SidebarMenu = () => {
@@ -21,14 +22,19 @@ const SidebarMenu = () => {
   }
 
   const items = [
-    getItem("Dashboard", "1", "/", <RocketOutlined />),
+    getItem("Dashboard", "1", "/", <DashboardOutlined />),
     getItem("Access", "2", "accessSubmenu", <TeamOutlined />, [
       getItem("Users", "3", "/users"),
       getItem("Roles", "4", "/roles"),
+      getItem("Invitations", "5", "/invitations"),
     ]),
-    getItem("Inventory", "5", "inventorySubmenu", <ShoppingOutlined />, [
-      getItem("Products", "6", "/products"),
-      getItem("Categories", "7", "/categories"),
+    getItem("Inventory", "6", "inventorySubmenu", <ShoppingOutlined />, [
+      getItem("Products", "7", "/products"),
+      getItem("Categories", "8", "/categories"),
+    ]),
+    getItem("Settings", "9", "settingsSubmenu", <SettingOutlined />, [
+      getItem("General", "10", "/settings/general"),
+      getItem("Integrations", "11", "/settings/integrations"),
     ]),
   ];
 
@@ -38,7 +44,12 @@ const SidebarMenu = () => {
       mode="inline"
       selectedKeys={[location.pathname]}
       defaultSelectedKeys={[location.pathname]}
-      defaultOpenKeys={[location.pathname, "accessSubmenu", "inventorySubmenu"]}
+      defaultOpenKeys={[
+        location.pathname,
+        "accessSubmenu",
+        "inventorySubmenu",
+        "settingsSubmenu",
+      ]}
     >
       {items.map((item) =>
         item.items ? (

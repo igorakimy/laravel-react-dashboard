@@ -1,7 +1,9 @@
 import {
+  HistoryOutlined,
   RightCircleFilled,
+  SettingOutlined,
   ShoppingOutlined,
-  TeamOutlined
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Alert, Card, Col, Row, Space, Typography } from "antd";
 import { Link } from "react-router-dom";
@@ -24,10 +26,36 @@ export default function Dashboard() {
       ),
     },
     {
-      path: "/inventory",
+      path: "/products",
       title: "Inventory",
       icon: (
         <ShoppingOutlined
+          style={{
+            fontSize: "30px",
+            color: "#1890ff",
+            float: "right",
+          }}
+        />
+      ),
+    },
+    {
+      path: "/activity",
+      title: "Activity",
+      icon: (
+        <HistoryOutlined
+          style={{
+            fontSize: "30px",
+            color: "#1890ff",
+            float: "right",
+          }}
+        />
+      ),
+    },
+    {
+      path: "/settings",
+      title: "Settings",
+      icon: (
+        <SettingOutlined
           style={{
             fontSize: "30px",
             color: "#1890ff",
@@ -48,19 +76,27 @@ export default function Dashboard() {
         type="info"
       />
 
-      <Row gutter={[{
-        xs: 8,
-        sm: 16,
-        md: 24,
-        lg: 32,
-      }, {xs: 8,
-        sm: 16,
-        md: 24,
-        lg: 32,}]}>
+      <Row
+        gutter={[
+          {
+            xs: 8,
+            sm: 16,
+            md: 24,
+            lg: 32,
+          },
+          { xs: 8, sm: 16, md: 24, lg: 32 },
+        ]}
+      >
         {dashboardItems.map((item) => (
-          <Col key={item.path} xs={{span: 24}} sm={{span: 23}} md={{span: 12}} lg={{span: 6}}>
+          <Col
+            key={item.path}
+            xs={{ span: 24 }}
+            sm={{ span: 23 }}
+            md={{ span: 12 }}
+            lg={{ span: 6 }}
+          >
             <Link to={item.path}>
-              <Card type="inner">
+              <Card type="inner" hoverable={true}>
                 <Text
                   strong
                   style={{
