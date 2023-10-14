@@ -40,6 +40,8 @@ const ProductsList = () => {
   const [searchedInfo, setSearchedInfo] = useState({});
   const [sortedInfo, setSortedInfo] = useState({});
 
+  const [editLoadings, setEditLoadings] = useState([]);
+
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: 1,
@@ -48,6 +50,10 @@ const ProductsList = () => {
       showQuickJumper: true,
     },
   });
+
+  useEffect(() => {
+    getProducts();
+  }, [JSON.stringify(tableParams)]);
 
   const getColumns = () => [
     {
@@ -88,17 +94,19 @@ const ProductsList = () => {
         sortedInfo.columnKey === "categories" ? sortedInfo.order : null,
       filteredValue: searchedInfo.categories || null,
       ...getColumnSearchProps("categories"),
-      render: (_, render) => {
-        return render.categories.map((category, i) => {
-          return (
-            <span>
-              <Link to={`/categories/${category.id}`}>
-                <Tag color="default">{category.name}</Tag>
-              </Link>
-            </span>
-          );
-        });
-      },
+      render: (_, render) => (
+        <Space size={[0, 4]} wrap>
+          {render.categories.map((category, i) => {
+            return (
+              <span>
+                <Link to={`/categories/${category.id}`}>
+                  <Tag color="default">{category.name}</Tag>
+                </Link>
+              </span>
+            );
+          })}
+        </Space>
+      ),
     },
     {
       title: "Type",
@@ -135,6 +143,7 @@ const ProductsList = () => {
             <Tooltip placement="top" title="Edit">
               <Button
                 size="small"
+                loading={editLoadings[render.id] || false}
                 onClick={() => showUpdateProductForm(render.id)}
                 icon={<EditFilled style={{ color: "#456cec" }} />}
               />
@@ -160,10 +169,6 @@ const ProductsList = () => {
       ),
     },
   ];
-
-  useEffect(() => {
-    getProducts();
-  }, [JSON.stringify(tableParams)]);
 
   const getProducts = () => {
     setLoading(true);
@@ -200,6 +205,14 @@ const ProductsList = () => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+
+  const enterEditLoading = (id, value) => {
+    setEditLoadings((prevLoadings) => {
+      let newLoadings = [...editLoadings];
+      newLoadings[id] = value;
+      return newLoadings;
+    });
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -312,11 +325,14 @@ const ProductsList = () => {
   };
 
   const showUpdateProductForm = (productId) => {
+    enterEditLoading(productId, true);
+
     axiosClient
       .get("/products/" + productId)
       .then(({ data }) => {
         setProduct(data);
         setOpenUpdateForm(true);
+        enterEditLoading(productId, false);
       })
       .catch(({ response }) => {
         showMessage("error", response?.data?.message);

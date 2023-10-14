@@ -15,7 +15,8 @@ final class ShowProduct extends Data
             'categories',
             'color',
             'material',
-            'vendor'
+            'vendor',
+            'media'
         ];
 
         if ( ! $product instanceof Product) {

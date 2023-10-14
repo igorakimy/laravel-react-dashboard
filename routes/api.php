@@ -32,6 +32,11 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     Route::apiResource('/users', UserController::class);
 
     /*
+     * Auth routes.
+     */
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    /*
      * Roles routes.
      */
     Route::apiResource('/roles', RoleController::class);
@@ -40,11 +45,6 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Permissions routes.
      */
     Route::apiResource('/permissions', PermissionController::class)->only('index');
-
-    /*
-     * Auth routes.
-     */
-    Route::post('/logout', [AuthController::class, 'logout']);
 
     /*
      * Categories routes.
@@ -75,6 +75,10 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Products routes.
      */
     Route::apiResource('/products', ProductController::class);
+    Route::post('/products/{product}/upload-media', [ProductController::class, 'uploadMedia'])
+         ->name('products.upload_media');
+    Route::delete('/products/{product}/delete-media/{media}', [ProductController::class, 'deleteMedia'])
+         ->name('products.delete_media');
 });
 
 /*

@@ -5,6 +5,7 @@ namespace App\Data\Product;
 use App\Data\Category\CategoryData;
 use App\Data\Color\ColorData;
 use App\Data\Material\MaterialData;
+use App\Data\Media\MediaData;
 use App\Data\Type\TypeData;
 use App\Data\Vendor\VendorData;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -42,6 +43,9 @@ final class ProductData extends Data
 
         public string|null $caption,
         public string|null $description,
+
+        #[DataCollectionOf(MediaData::class)]
+        public DataCollection|null $media,
     ) {
     }
 }

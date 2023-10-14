@@ -17,8 +17,10 @@ final class FetchPaginatedProducts extends ApiAction
         ProductSortingData $sorting,
         ProductFilteringData $filtering
     ): PaginatedDataCollection {
-        $products = Product::query()
-                           ->with(['type', 'categories', 'color', 'material', 'vendor']);
+
+        $relations = ['type', 'categories', 'color', 'material', 'vendor', 'media'];
+
+        $products = Product::query()->with($relations);
 
         // apply filters
         if ($filtering->filters) {

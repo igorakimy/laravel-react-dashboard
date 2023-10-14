@@ -9,8 +9,11 @@ use App\Models\Product;
 
 final class UpdateProduct extends ApiAction
 {
-    public function handle(Product $product, ProductUpdateData $data): ProductData
-    {
+    public function handle(
+        Product $product,
+        ProductUpdateData $data,
+    ): ProductData {
+
         $product->name = $data->name;
         $product->sku = $data->sku;
         $product->quantity = $data->quantity;

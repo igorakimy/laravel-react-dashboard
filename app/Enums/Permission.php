@@ -34,6 +34,8 @@ enum Permission: string
     case CAN_UPDATE_PRODUCT = 'products.update';
     case CAN_DELETE_PRODUCT = 'products.destroy';
     case CAN_READ_LIST_PRODUCTS = 'products.index';
+    case CAN_UPLOAD_MEDIA = 'products.upload_media';
+    case CAN_DELETE_MEDIA = 'products.delete_media';
 
     /**
      * Get the name of the permission.
@@ -68,6 +70,8 @@ enum Permission: string
             self::CAN_UPDATE_PRODUCT => 'Update Product',
             self::CAN_DELETE_PRODUCT => 'Delete Product',
             self::CAN_READ_LIST_PRODUCTS => 'Read All Products',
+            self::CAN_UPLOAD_MEDIA => 'Upload Product Media',
+            self::CAN_DELETE_MEDIA => 'Delete Product Media',
         };
     }
 }
