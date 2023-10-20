@@ -34,7 +34,7 @@ const ProductCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
 
   const getCategories = () => {
     axiosClient
-      .get("/categories")
+      .get("/categories?kind=select")
       .then(({ data }) => {
         setCategories(
           data.map((item) => {

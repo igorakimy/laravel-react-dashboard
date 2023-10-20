@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\Api\Category\DeleteCategory;
 use App\Actions\Api\Category\FetchCategoriesForSelect;
+use App\Actions\Api\Category\FetchCategoriesForTree;
 use App\Actions\Api\Category\FetchPaginatedCategories;
 use App\Actions\Api\Category\ShowCategory;
 use App\Actions\Api\Category\StoreCategory;
@@ -24,6 +25,7 @@ final class CategoryController extends ApiController
     public function __construct(
         public FetchPaginatedCategories $fetchPaginatedCategoriesAction,
         public FetchCategoriesForSelect $fetchCategoriesForSelectAction,
+        public FetchCategoriesForTree $fetchCategoriesForTreeAction,
         public ShowCategory $showCategoryAction,
         public StoreCategory $storeCategoryAction,
         public UpdateCategory $updateCategoryAction,
@@ -43,11 +45,14 @@ final class CategoryController extends ApiController
         $pagination = CategoryPaginationData::fromRequest($request);
         $sorting = CategorySortingData::fromRequest($request);
 
-        if ($request->has('for_select')) {
-            $categories = $this->fetchCategoriesForSelectAction->handle();
-        } else {
-            $categories = $this->fetchPaginatedCategoriesAction->handle($pagination, $sorting);
-        }
+        $categories = match ($request->input('kind')) {
+            'select' => $this->fetchCategoriesForSelectAction->handle(),
+            'tree' => $this->fetchCategoriesForTreeAction->handle(),
+            default => $this->fetchPaginatedCategoriesAction->handle(
+                $pagination,
+                $sorting
+            )
+        };
 
         return response($categories);
     }

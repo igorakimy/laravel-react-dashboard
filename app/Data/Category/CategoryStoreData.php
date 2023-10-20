@@ -16,6 +16,9 @@ final class CategoryStoreData extends Data
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public static function fromRequest(Request $request): self
     {
         $request->validate(self::rules());

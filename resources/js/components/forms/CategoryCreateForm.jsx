@@ -16,7 +16,7 @@ const CategoryCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
 
   const getCategories = () => {
     axiosClient
-      .get("/categories?for_select=true")
+      .get("/categories?kind=select")
       .then(({ data }) => {
         setCategories(
           data.map((item) => {
