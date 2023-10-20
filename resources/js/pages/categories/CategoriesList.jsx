@@ -27,6 +27,7 @@ const CategoriesList = () => {
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [openTable, setOpenTable] = useState(false);
   const [openList, setOpenList] = useState(false);
+  const [viewType, setViewType] = useState("Table");
   const [treeData, setTreeData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -106,6 +107,7 @@ const CategoriesList = () => {
     setOpenTable(true);
     setOpenList(false);
     getCategories();
+    getCategoriesForTree();
   }, [JSON.stringify(tableParams)]);
 
   const getCategories = () => {
@@ -115,9 +117,6 @@ const CategoriesList = () => {
         params: getTableParams(tableParams),
       })
       .then(({ data }) => {
-        setTreeData(
-          convertToTreeData(data.data.filter((item) => item.parent === null)),
-        );
         setCategories(data.data);
         // console.log(convertToTreeData(data.data));
         setLoading(false);
@@ -134,7 +133,21 @@ const CategoriesList = () => {
         });
       })
       .catch((err) => {
+        console.log(err);
         setLoading(false);
+      });
+  };
+
+  const getCategoriesForTree = () => {
+    axiosClient
+      .get("/categories?kind=tree")
+      .then(({ data }) => {
+        setTreeData(
+          convertToTreeData(data.filter((item) => item.parent === null)),
+        );
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -146,7 +159,9 @@ const CategoriesList = () => {
         title: item.name,
         value: item.name,
         children:
-          item.children.length > 0 ? convertToTreeData(item.children) : null,
+          item.children && item.children.length > 0
+            ? convertToTreeData(item.children)
+            : null,
       };
     });
   };
@@ -176,6 +191,7 @@ const CategoriesList = () => {
       .then(({ data }) => {
         setOpenCreateForm(false);
         getCategories();
+        getCategoriesForTree();
         showMessage("success", "Category successfully created!");
       })
       .catch(({ response }) => {
@@ -211,6 +227,7 @@ const CategoriesList = () => {
       .then(({ data }) => {
         setOpenUpdateForm(false);
         getCategories();
+        getCategoriesForTree();
         showMessage("success", "Category successfully updated!");
       })
       .catch(({ response }) => {
@@ -233,6 +250,7 @@ const CategoriesList = () => {
       .delete("/categories/" + id)
       .then(({ data }) => {
         getCategories();
+        getCategoriesForTree();
         showMessage("success", "Category successfully deleted!");
       })
       .catch(({ response }) => {
@@ -262,18 +280,16 @@ const CategoriesList = () => {
 
   const handleChangeCategoriesView = (value) => {
     if (value === "Table") {
-      setOpenTable(true);
-      setOpenList(false);
+      setViewType("Table");
     } else {
-      setOpenList(true);
-      setOpenTable(false);
+      setViewType("Tree");
     }
   };
 
   const renderTreeNodes = (data) =>
     data.map((item) => {
       item.title = (
-        <Space style={{ padding: 10 }}>
+        <Space style={{ padding: 4 }}>
           {item.value}
           <Space size={8} style={{ marginLeft: 8 }}>
             <Button
@@ -341,11 +357,13 @@ const CategoriesList = () => {
         onChange={handleChangeCategoriesView}
         options={[
           {
+            label: "Table",
             value: "Table",
             icon: <TableOutlined />,
           },
           {
-            value: "List",
+            label: "Tree",
+            value: "Tree",
             icon: <BarsOutlined />,
           },
         ]}
@@ -365,14 +383,14 @@ const CategoriesList = () => {
         scroll={{ y: 450, x: 500 }}
         size="small"
         style={{
-          display: openTable ? "block" : "none",
+          display: viewType === "Table" ? "block" : "none",
         }}
       />
 
       <Tree
         showLine={true}
         style={{
-          display: openList ? "block" : "none",
+          display: viewType === "Tree" ? "block" : "none",
         }}
         showIcon={false}
       >

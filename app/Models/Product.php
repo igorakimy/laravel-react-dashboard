@@ -63,6 +63,16 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereWidth($value)
  * @method orderByCategories(string $direction)
  * @method orderByType(string $direction)
+ * @property int $quantity
+ * @property string|null $margin
+ * @property-read \App\Models\Color|null $color
+ * @property-read \App\Models\Material|null $material
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @property-read \App\Models\Type|null $type
+ * @property-read \App\Models\Vendor|null $vendor
+ * @method static Builder|Product whereMargin($value)
+ * @method static Builder|Product whereQuantity($value)
  * @mixin \Eloquent
  */
 class Product extends Model implements HasMedia

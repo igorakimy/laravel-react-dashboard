@@ -12,9 +12,7 @@ import router from "./router.jsx";
 const root = createRoot(document.getElementById("app"));
 
 root.render(
-  <StrictMode>
-    <ContextProvider>
-      <RouterProvider router={router} />
-    </ContextProvider>
-  </StrictMode>,
+  <ContextProvider>
+    <RouterProvider router={router} />
+  </ContextProvider>,
 );

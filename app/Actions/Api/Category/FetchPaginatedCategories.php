@@ -17,7 +17,6 @@ final class FetchPaginatedCategories extends ApiAction
     ): PaginatedDataCollection {
 
         $categories = Category::query()
-                              ->with(['parent', 'children'])
                               ->orderBy($sorting->column, $sorting->direction)
                               ->paginate(
                                   $pagination->pageSize,

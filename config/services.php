@@ -31,4 +31,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'zoho_books' => [
+        'domain' => env('ZOHO_BOOKS_DOMAIN', 'com'),
+        'client_id' => env('ZOHO_BOOKS_CLIENT_ID', 'client_id'),
+        'client_secret' => env('ZOHO_BOOKS_CLIENT_SECRET', 'client_secret'),
+        'redirect_uri' => env('APP_URL') . '/check/zoho-books',
+        'organization_id' => env('ZOHO_BOOKS_ORGANIZATION_ID', 'organization_id'),
+        'scopes' => [
+            'ZohoBooks.fullaccess.all',
+        ],
+    ],
 ];

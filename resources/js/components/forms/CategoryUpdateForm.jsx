@@ -1,7 +1,7 @@
 import { Divider, Form, Input, Modal, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios-client.js";
-import TextArea from "antd/es/input/TextArea.js";
+import TextArea from "antd/es/input/TextArea";
 
 const CategoryUpdateForm = ({
   open,
@@ -19,13 +19,13 @@ const CategoryUpdateForm = ({
 
   useEffect(() => {
     form.setFieldsValue(category);
-    form.setFieldValue("parent", category.parent);
+    form.setFieldValue("parent", category.parent?.id);
     getCategories();
   }, [category]);
 
   const getCategories = () => {
     axiosClient
-      .get("/categories?for_select=true")
+      .get("/categories?kind=select")
       .then(({ data }) => {
         setCategories(
           data

@@ -11,10 +11,9 @@ final class FetchCategoriesForSelect extends ApiAction
 {
     public function handle(): DataCollection {
 
-        $categories = Category::query()
-                              ->with(['parent', 'children'])
-                              ->get();
+        $categories = Category::query()->get();
 
-        return CategoryData::collection($categories);
+        return CategoryData::collection($categories)
+                           ->include('parent', 'children');
     }
 }

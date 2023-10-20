@@ -18,7 +18,16 @@ final class FetchPaginatedProducts extends ApiAction
         ProductFilteringData $filtering
     ): PaginatedDataCollection {
 
-        $relations = ['type', 'categories', 'color', 'material', 'vendor', 'media'];
+        $relations = [
+            'type',
+            'categories',
+            'categories.parent',
+            'categories.children',
+            'color',
+            'material',
+            'vendor',
+            'media'
+        ];
 
         $products = Product::query()->with($relations);
 

@@ -32,10 +32,7 @@ const SidebarMenu = () => {
       getItem("Products", "7", "/products"),
       getItem("Categories", "8", "/categories"),
     ]),
-    getItem("Settings", "9", "settingsSubmenu", <SettingOutlined />, [
-      getItem("General", "10", "/settings/general"),
-      getItem("Integrations", "11", "/settings/integrations"),
-    ]),
+    getItem("Settings", "9", "/settings", <SettingOutlined />),
   ];
 
   return (

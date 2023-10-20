@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 final class CategoryData extends Data
@@ -18,10 +19,10 @@ final class CategoryData extends Data
         public string $slug,
         public string|null $description,
 
-        public int|null $parent,
+        public CategoryData|Lazy|null $parent,
 
         #[DataCollectionOf(CategoryData::class)]
-        public DataCollection|null $children,
+        public DataCollection|Lazy|null $children,
 
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d H:i:s')]
         public ?Carbon $created_at,
@@ -33,15 +34,21 @@ final class CategoryData extends Data
 
     public static function fromModel(Category $category): self
     {
-        $category->load(['parent', 'children']);
-
         return new self(
             id: $category->id,
             name: $category->name,
             slug: $category->slug,
             description: $category->description,
-            parent: $category->parent?->id,
-            children: CategoryData::collection($category->children),
+            parent: Lazy::whenLoaded(
+                'parent',
+                $category,
+                fn() => $category->parent ? CategoryData::from($category->parent)->include('children') : null
+            ),
+            children: Lazy::whenLoaded(
+                'children',
+                $category,
+                fn() => CategoryData::collection($category->children)->include('children')
+            ),
             created_at: $category->created_at,
             updated_at: $category->updated_at
         );

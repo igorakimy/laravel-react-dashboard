@@ -42,7 +42,20 @@ class Category extends Model
     use HasFactory;
     use HasSlug;
 
-    protected $guarded = [];
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'parent_id',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $with = ['children'];
 
     // =================== //
     //      RELATIONS      //

@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\ZohoBooksSettingsController;
+use App\Http\Controllers\Integration\ZohoBooksController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -79,6 +81,29 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
          ->name('products.upload_media');
     Route::delete('/products/{product}/delete-media/{media}', [ProductController::class, 'deleteMedia'])
          ->name('products.delete_media');
+
+    /**
+     * Settings routes.
+     */
+    Route::get('/settings/zoho-books', [ZohoBooksSettingsController::class, 'index'])
+         ->name('settings.zoho_books.index');
+    Route::put('/settings/zoho-books', [ZohoBooksSettingsController::class, 'update'])
+         ->name('settings.zoho_books.update');
+});
+
+/**
+ * Integrations routes.
+ */
+Route::middleware(['auth:sanctum'])->prefix('integrations')->group(function () {
+    /**
+     * Zoho Books routes.
+     */
+    Route::group(['prefix' => 'zoho-books'], function () {
+        Route::get('/authenticate', [ZohoBooksController::class, 'authenticateUrl'])
+             ->name('integrations.zoho_books.authenticate');
+        Route::get('/callback', [ZohoBooksController::class, 'handleAuthCallback'])
+             ->name('integrations.zoho_books.callback');
+    });
 });
 
 /*
