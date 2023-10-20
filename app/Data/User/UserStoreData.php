@@ -7,6 +7,7 @@ use App\Data\Transformers\HashableTransformer;
 use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Password;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
@@ -59,7 +60,16 @@ class UserStoreData extends Data
             'first_name' => ['required', 'string', 'max:150'],
             'last_name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'unique:users,email', 'max:150'],
-            'password' => ['required', 'min:8', 'max:64', 'confirmed'],
+            'password' => [
+                'required',
+                'min:8',
+                'max:64',
+                'confirmed',
+                Password::min(8)
+                        ->letters()
+                        ->numbers()
+                        ->symbols(),
+            ],
             'status' => ['required', new Enum(UserStatus::class)],
             'roles' => ['required', 'array'],
         ];

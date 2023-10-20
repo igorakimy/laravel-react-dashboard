@@ -79,7 +79,10 @@ class UserUpdateData extends Data
             'password' => [
                 'confirmed',
                 'max:255',
-                Password::min(8),
+                Password::min(8)
+                        ->letters()
+                        ->numbers()
+                        ->symbols(),
             ],
         ];
     }

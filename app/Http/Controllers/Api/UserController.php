@@ -67,6 +67,7 @@ class UserController extends ApiController
     public function show(User $user)
     {
         $userData = $this->showUserAction->handle($user);
+
         return response($userData);
     }
 

@@ -8,7 +8,6 @@ import Dashboard from "./pages/Dashboard.jsx";
 import RolesList from "./pages/roles/RolesList.jsx";
 import ProductsList from "./pages/products/ProductsList.jsx";
 import CategoriesList from "./pages/categories/CategoriesList.jsx";
-import ZohoBooksCallback from "./pages/settings/ZohoBooksCallback.jsx";
 import Settings from "./pages/settings/Settings.jsx";
 
 const router = createBrowserRouter([
