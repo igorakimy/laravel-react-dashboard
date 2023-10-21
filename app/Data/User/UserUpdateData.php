@@ -30,6 +30,8 @@ class UserUpdateData extends Data
 
         #[DataCollectionOf(RoleData::class)]
         public DataCollection $roles,
+
+        public array $phones,
     ) {}
 
     /**
@@ -53,7 +55,8 @@ class UserUpdateData extends Data
                     ->with('permissions')
                     ->findMany($request->input('roles'))
                     ->toArray()
-            )
+            ),
+            phones: $request->input('phones', [])
         );
     }
 
@@ -84,6 +87,10 @@ class UserUpdateData extends Data
                         ->numbers()
                         ->symbols(),
             ],
+            'phones' => [
+                'nullable',
+                'array',
+            ]
         ];
     }
 }

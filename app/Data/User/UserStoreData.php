@@ -26,7 +26,9 @@ class UserStoreData extends Data
         public string $password,
 
         #[DataCollectionOf(RoleData::class)]
-        public DataCollection $roles
+        public DataCollection $roles,
+
+        public array $phones,
     ) {}
 
     /**
@@ -48,6 +50,7 @@ class UserStoreData extends Data
                 Role::query()
                     ->with('permissions')
                     ->findMany($request->input('roles'))),
+            phones: $request->input('phones', []),
         );
     }
 
@@ -72,6 +75,7 @@ class UserStoreData extends Data
             ],
             'status' => ['required', new Enum(UserStatus::class)],
             'roles' => ['required', 'array'],
+            'phones' => ['nullable', 'array'],
         ];
     }
 }

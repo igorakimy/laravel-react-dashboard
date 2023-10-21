@@ -1,6 +1,16 @@
-import { Divider, Form, Input, Modal, Select, Typography } from "antd";
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios-client.js";
+import { CloseOutlined } from "@ant-design/icons";
 
 const UserUpdateForm = ({
   open,
@@ -227,6 +237,39 @@ const UserUpdateForm = ({
           }
         >
           <Input.Password onChange={handleInputChange} />
+        </Form.Item>
+
+        <Form.Item label="Phones">
+          <Form.List name="phones">
+            {(fields, { add, remove }, { errors }) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                  rowGap: 16,
+                }}
+              >
+                {fields.map((field) => (
+                  <Space key={field.key}>
+                    <Form.Item noStyle name={[field.name]}>
+                      <Input placeholder="phone number" />
+                    </Form.Item>
+                    <CloseOutlined
+                      onClick={() => {
+                        console.log(field, fields);
+                        remove(field.name);
+                      }}
+                    />
+                  </Space>
+                ))}
+                <Button type="dashed" onClick={() => add()} block>
+                  + Add Phone
+                </Button>
+                <Form.ErrorList errors={errors} />
+              </div>
+            )}
+          </Form.List>
         </Form.Item>
       </Form>
     </Modal>

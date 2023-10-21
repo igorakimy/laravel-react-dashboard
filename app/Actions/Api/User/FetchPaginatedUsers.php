@@ -14,7 +14,7 @@ final class FetchPaginatedUsers extends ApiAction
 {
     public function handle(UserPaginationData $pagination, UserSortingData $sorting): PaginatedDataCollection
     {
-        $query = User::query()->with(['roles', 'roles.permissions']);
+        $query = User::query()->with(['roles', 'roles.permissions', 'phones']);
 
         // apply sorting.
         if ($sorting->column == 'roles') {

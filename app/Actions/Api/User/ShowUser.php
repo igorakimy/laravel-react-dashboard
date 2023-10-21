@@ -14,7 +14,7 @@ final class ShowUser extends Data
             $user = User::query()->findOrFail($user);
         }
 
-        $user->load(['roles', 'roles.permissions']);
+        $user->load(['roles', 'roles.permissions', 'phones']);
 
         return UserData::from($user);
     }
