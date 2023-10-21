@@ -8,6 +8,7 @@ use App\Actions\Api\User\ShowUser;
 use App\Actions\Api\User\StoreUser;
 use App\Actions\Api\User\UpdateUser;
 use App\Data\User\UserPaginationData;
+use App\Data\User\UserSortingData;
 use App\Data\User\UserStoreData;
 use App\Data\User\UserUpdateData;
 use App\Enums\UserStatus;
@@ -38,9 +39,13 @@ class UserController extends ApiController
      */
     public function index(Request $request)
     {
-        $data = UserPaginationData::fromRequest($request);
+        $paginationData = UserPaginationData::fromRequest($request);
+        $sortingData = UserSortingData::fromRequest($request);
 
-        $users = $this->fetchPaginatedUsersAction->handle($data);
+        $users = $this->fetchPaginatedUsersAction->handle(
+            $paginationData,
+            $sortingData,
+        );
 
         return response($users);
     }

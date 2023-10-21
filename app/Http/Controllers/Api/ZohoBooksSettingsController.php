@@ -17,6 +17,11 @@ final class ZohoBooksSettingsController extends ApiController
     ) {
     }
 
+    /**
+     * Get all Zoho Books settings list.
+     *
+     * @return Response
+     */
     public function index(): Response
     {
         $settings = $this->fetchZohoBooksSettingsAction->handle();
@@ -24,7 +29,14 @@ final class ZohoBooksSettingsController extends ApiController
         return response($settings);
     }
 
-    public function update(Request $request)
+    /**
+     * Update Zoho Books settings.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
+     */
+    public function update(Request $request): Response
     {
         $settingsData = ZohoBooksSettingsData::fromRequest($request);
 

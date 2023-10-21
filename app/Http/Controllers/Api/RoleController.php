@@ -9,6 +9,7 @@ use App\Actions\Api\Role\ShowRole;
 use App\Actions\Api\Role\StoreRole;
 use App\Actions\Api\Role\UpdateRole;
 use App\Data\Role\RolePaginationData;
+use App\Data\Role\RoleSortingData;
 use App\Data\Role\RoleStoreData;
 use App\Data\Role\RoleUpdateData;
 use App\Http\Controllers\ApiController;
@@ -31,7 +32,7 @@ final class RoleController extends ApiController
     }
 
     /**
-     * Show list of roles.
+     * Get list of roles.
      *
      * @param  Request  $request
      *
@@ -39,19 +40,19 @@ final class RoleController extends ApiController
      */
     public function index(Request $request): Response
     {
-        if ($request->has('for_select')) {
-            $roles = $this->fetchRolesForSelectAction->handle();
-        } else {
-            $roles = $this->fetchPaginatedRolesAction->handle(
-                RolePaginationData::fromRequest($request)
-            );
-        }
+        $roles = match ($request->input('kind')) {
+            'select' => $this->fetchRolesForSelectAction->handle(),
+            default => $this->fetchPaginatedRolesAction->handle(
+                RolePaginationData::fromRequest($request),
+                RoleSortingData::fromRequest($request),
+            )
+        };
 
         return response($roles);
     }
 
     /**
-     * Show one role.
+     * Get one role.
      *
      * @param  Role  $role
      *
@@ -100,6 +101,8 @@ final class RoleController extends ApiController
     }
 
     /**
+     * Delete the role.
+     *
      * @param  Role  $role
      *
      * @return Response

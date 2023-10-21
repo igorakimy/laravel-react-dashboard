@@ -17,7 +17,7 @@ const UserCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
 
   const getRoles = () => {
     axiosClient
-      .get("/roles?for_select=true")
+      .get("/roles?kind=select")
       .then(({ data }) => {
         if (!data) return;
         setRoles(

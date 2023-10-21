@@ -51,10 +51,10 @@ const RolesList = () => {
       dataIndex: "permissions",
       sorter: true,
       render: (_, { permissions }) => (
-        <Space size={[0, 8]} wrap>
+        <Space size={[0, 4]} wrap>
           {permissions.map((permission) => {
             return (
-              <Tag color="#149D9F" key={permission.name}>
+              <Tag color="#389e0d" key={permission.name}>
                 {permission.display_name.toUpperCase()}
               </Tag>
             );

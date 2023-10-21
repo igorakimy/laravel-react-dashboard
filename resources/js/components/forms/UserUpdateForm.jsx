@@ -65,7 +65,7 @@ const UserUpdateForm = ({
 
   const getRoles = () => {
     axiosClient
-      .get("/roles?for_select=true")
+      .get("/roles?kind=select")
       .then(({ data }) => {
         if (!data) return;
         setRoles(
