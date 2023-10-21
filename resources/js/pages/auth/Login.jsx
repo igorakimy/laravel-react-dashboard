@@ -87,7 +87,7 @@ export default function Login() {
             offset: 8,
           }}
           style={{
-            marginTop: "2rem",
+            marginTop: "10rem",
           }}
         >
           {message ? (

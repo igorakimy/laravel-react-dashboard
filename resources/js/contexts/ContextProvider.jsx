@@ -8,7 +8,9 @@ const StateContext = createContext({
 });
 
 export const ContextProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, _setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("CURRENT_USER")),
+  );
   const [token, _setToken] = useState(localStorage.getItem("ACCESS_TOKEN"));
 
   const setToken = (token) => {
@@ -22,7 +24,19 @@ export const ContextProvider = ({ children }) => {
     }
   };
 
+  const setCurrentUser = (user) => {
+    _setCurrentUser(user);
+
+    if (user) {
+      user = JSON.stringify(user);
+      localStorage.setItem("CURRENT_USER", user);
+    } else {
+      localStorage.removeItem("CURRENT_USER");
+    }
+  };
+
   const can = (permissions) => {
+    // console.log(currentUser);
     if (
       !currentUser ||
       (!currentUser?.permissions && !currentUser.isSuperAdmin)

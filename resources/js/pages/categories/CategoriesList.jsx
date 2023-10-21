@@ -20,9 +20,11 @@ import Icon, {
 import axiosClient from "../../axios-client.js";
 import CategoryUpdateForm from "../../components/forms/CategoryUpdateForm.jsx";
 import CategoryCreateForm from "../../components/forms/CategoryCreateForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CategoriesList = () => {
   const { can } = useStateContext();
+  const navigate = useNavigate();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [openTable, setOpenTable] = useState(false);
@@ -104,6 +106,10 @@ const CategoriesList = () => {
   ];
 
   useEffect(() => {
+    if (!can("categories.index")) {
+      navigate("/forbidden");
+    }
+
     setOpenTable(true);
     setOpenList(false);
     getCategories();

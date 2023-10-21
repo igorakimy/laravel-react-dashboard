@@ -14,8 +14,10 @@ import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
 import RoleCreateForm from "../../components/forms/RoleCreateForm.jsx";
 import RoleUpdateForm from "../../components/forms/RoleUpdateForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 const RolesList = () => {
+  const navigate = useNavigate();
   const { can } = useStateContext();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
@@ -107,6 +109,10 @@ const RolesList = () => {
   ];
 
   useEffect(() => {
+    if (!can("roles.index")) {
+      navigate("/forbidden");
+    }
+
     getRoles();
   }, [JSON.stringify(tableParams)]);
 

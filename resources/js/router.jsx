@@ -9,6 +9,7 @@ import RolesList from "./pages/roles/RolesList.jsx";
 import ProductsList from "./pages/products/ProductsList.jsx";
 import CategoriesList from "./pages/categories/CategoriesList.jsx";
 import Settings from "./pages/settings/Settings.jsx";
+import Error403 from "./pages/errors/Error403.jsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
     ],
   },
 
+  {
+    path: "/forbidden",
+    element: <Error403 />,
+  },
   {
     path: "*",
     element: <Error404 />,

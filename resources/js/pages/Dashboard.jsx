@@ -74,6 +74,9 @@ export default function Dashboard() {
         message="Welcome!"
         description="To continue working, select one of the menu items."
         type="info"
+        style={{
+          maxWidth: "380px",
+        }}
       />
 
       <Row

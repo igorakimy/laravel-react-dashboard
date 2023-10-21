@@ -20,12 +20,13 @@ import {
   SyncOutlined,
 } from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductCreateForm from "../../components/forms/ProductCreateForm.jsx";
 import ProductUpdateForm from "../../components/forms/ProductUpdateForm.jsx";
 
 const ProductsList = () => {
   const { can } = useStateContext();
+  const navigate = useNavigate();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [products, setProducts] = useState([]);
@@ -50,6 +51,12 @@ const ProductsList = () => {
       showQuickJumper: true,
     },
   });
+
+  useEffect(() => {
+    if (!can("products.index")) {
+      navigate("/forbidden");
+    }
+  }, []);
 
   useEffect(() => {
     getProducts();
@@ -421,8 +428,8 @@ const ProductsList = () => {
                 setOpenCreateForm(true);
               }}
             >
-              Create
               <PlusOutlined />
+              Create
             </Button>
           ) : null}
         </Space>

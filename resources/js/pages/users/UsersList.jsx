@@ -14,9 +14,11 @@ import axiosClient from "../../axios-client.js";
 import UserCreateForm from "../../components/forms/UserCreateForm.jsx";
 import UserUpdateForm from "../../components/forms/UserUpdateForm.jsx";
 import { useStateContext } from "../../contexts/ContextProvider.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function UsersList() {
   const { can, currentUser } = useStateContext();
+  const navigate = useNavigate();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [users, setUsers] = useState([]);
@@ -34,6 +36,10 @@ export default function UsersList() {
   });
 
   useEffect(() => {
+    if (!can("users.index")) {
+      navigate("/forbidden");
+    }
+
     getUsers();
   }, [JSON.stringify(tableParams)]);
 

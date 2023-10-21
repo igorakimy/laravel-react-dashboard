@@ -26,6 +26,10 @@ enum Permission: string
     case CAN_READ_LIST_PERMISSIONS = 'permissions.index';
 
     // Categories
+    case CAN_READ_CATEGORY = 'categories.show';
+    case CAN_CREATE_CATEGORY = 'categories.store';
+    case CAN_UPDATE_CATEGORY = 'categories.update';
+    case CAN_DELETE_CATEGORY = 'categories.destroy';
     case CAN_READ_LIST_CATEGORIES = 'categories.index';
 
     // Products
@@ -36,6 +40,11 @@ enum Permission: string
     case CAN_READ_LIST_PRODUCTS = 'products.index';
     case CAN_UPLOAD_MEDIA = 'products.upload_media';
     case CAN_DELETE_MEDIA = 'products.delete_media';
+
+    // Settings
+    case CAN_READ_LIST_SETTINGS = 'settings.index';
+    case CAN_READ_ZOHO_BOOKS_SETTINGS = 'settings.zoho_books.index';
+    case CAN_UPDATE_ZOHO_BOOKS_SETTINGS = 'settings.zoho_books.update';
 
     /**
      * Get the name of the permission.
@@ -63,6 +72,10 @@ enum Permission: string
             self::CAN_DELETE_PERMISSION => 'Delete Permission',
             self::CAN_READ_LIST_PERMISSIONS => 'Read All Permissions',
 
+            self::CAN_READ_CATEGORY => 'Read Category',
+            self::CAN_CREATE_CATEGORY => 'Create Category',
+            self::CAN_UPDATE_CATEGORY => 'Update Category',
+            self::CAN_DELETE_CATEGORY => 'Delete Category',
             self::CAN_READ_LIST_CATEGORIES => 'Read All Categories',
 
             self::CAN_READ_PRODUCT => 'Read Product',
@@ -72,6 +85,10 @@ enum Permission: string
             self::CAN_READ_LIST_PRODUCTS => 'Read All Products',
             self::CAN_UPLOAD_MEDIA => 'Upload Product Media',
             self::CAN_DELETE_MEDIA => 'Delete Product Media',
+
+            self::CAN_READ_LIST_SETTINGS => 'Read All Settings',
+            self::CAN_READ_ZOHO_BOOKS_SETTINGS => 'Read Zoho Books Settings',
+            self::CAN_UPDATE_ZOHO_BOOKS_SETTINGS => 'Update Zoho Books Settings',
         };
     }
 }
