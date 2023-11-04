@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
@@ -47,6 +48,16 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Permissions routes.
      */
     Route::apiResource('/permissions', PermissionController::class)->only('index');
+
+    /**
+     * Invitations routes.
+     */
+    Route::group(['prefix' => 'invitations', 'as' => 'invitations.'], function () {
+        Route::get('/', [InvitationController::class, 'index'])->name('index');
+        Route::post('/send', [InvitationController::class, 'send'])->name('send');
+        Route::post('/resend/{invitation}', [InvitationController::class, 'resend'])->name('resend');
+        Route::post('/revoke/{invitation}', [InvitationController::class, 'revoke'])->name('revoke');
+    });
 
     /*
      * Categories routes.
@@ -109,8 +120,10 @@ Route::middleware(['auth:sanctum'])->prefix('integrations')->group(function () {
 /*
  * Guest auth routes.
  */
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register/{token}', [AuthController::class, 'register'])
+    ->name('register');
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login');
 
 /**
  * Guest user routes.

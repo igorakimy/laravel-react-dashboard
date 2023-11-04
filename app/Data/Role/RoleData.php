@@ -11,6 +11,7 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 final class RoleData extends Data
@@ -20,7 +21,7 @@ final class RoleData extends Data
         public string $name,
 
         #[DataCollectionOf(PermissionData::class)]
-        public DataCollection $permissions,
+        public Lazy|DataCollection $permissions,
 
         #[WithCast(DateTimeInterfaceCast::class, format: "Y-m-d\TH:i:s.u\Z")]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d H:i:s')]
@@ -37,7 +38,7 @@ final class RoleData extends Data
         return new self(
             id: $role->id,
             name: $role->name,
-            permissions: PermissionData::collection($role->permissions),
+            permissions: Lazy::create(fn() => PermissionData::collection($role->permissions)),
             created_at: $role->created_at,
             updated_at: $role->updated_at,
         );

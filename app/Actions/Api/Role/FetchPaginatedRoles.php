@@ -8,19 +8,16 @@ use App\Data\Role\RolePaginationData;
 use App\Data\Role\RoleSortingData;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Enums\Role as RoleEnum;
 use Spatie\LaravelData\PaginatedDataCollection;
 
 final class FetchPaginatedRoles extends ApiAction
 {
     public function handle(RolePaginationData $pagination, RoleSortingData $sorting): PaginatedDataCollection
     {
-        $roles = Role::query()
-                     ->with('permissions')
-                     ->whereNot('name', RoleEnum::SUPER_ADMIN);
+        $roles = Role::query()->with('permissions');
 
+        // apply sorting
         $sortColumn = $sorting->column;
-
         if ($sorting->column == 'permissions') {
             $sortColumn = Permission::query()->selectRaw('STRING_AGG(display_name, \', \')')
                                     ->join(
@@ -32,6 +29,7 @@ final class FetchPaginatedRoles extends ApiAction
                                     ->groupBy('role_has_permissions.role_id');
         }
 
+        // paginate
         $roles = $roles->orderBy($sortColumn, $sorting->direction)
                        ->paginate(
                            $pagination->pageSize,
@@ -40,6 +38,6 @@ final class FetchPaginatedRoles extends ApiAction
                            $pagination->currentPage
                        );
 
-        return RoleData::collection($roles);
+        return RoleData::collection($roles)->include('permissions');
     }
 }

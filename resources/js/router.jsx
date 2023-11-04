@@ -10,6 +10,8 @@ import ProductsList from "./pages/products/ProductsList.jsx";
 import CategoriesList from "./pages/categories/CategoriesList.jsx";
 import Settings from "./pages/settings/Settings.jsx";
 import Error403 from "./pages/errors/Error403.jsx";
+import InvitationsList from "./pages/invitations/InvitationsList.jsx";
+import Register from "./pages/auth/Register.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/roles",
         element: <RolesList />,
+      },
+      {
+        path: "/invitations",
+        element: <InvitationsList />,
       },
       {
         path: "/products",
@@ -50,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/register/:token",
+        element: <Register />,
       },
     ],
   },

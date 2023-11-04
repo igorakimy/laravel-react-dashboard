@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Throwable;
 
@@ -32,6 +33,16 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'message' => 'Access denied',
             ], 403);
+        });
+
+        $this->renderable(function (AppException $e, Request $request) {
+            $code = $e->getExceptionCode();
+
+            return response()->json([
+                'status' => 'error',
+                'code' => $code->value,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
         });
     }
 }

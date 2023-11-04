@@ -9,6 +9,7 @@ class FilteringData extends Data
 {
     public function __construct(
         public array $filters,
+        public string $operator = "AND",
     ) {
     }
 
@@ -17,7 +18,8 @@ class FilteringData extends Data
         $request->validate(static::rules());
 
         return new static(
-            filters: $request->input('filters', [])
+            filters: $request->input('filters', []),
+            operator: $request->input('operator', 'AND'),
         );
     }
 

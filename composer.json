@@ -23,6 +23,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",
         "barryvdh/laravel-ide-helper": "^2.13",
+        "tutorigo/laravel-ide-macros": "dev-master",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
@@ -31,6 +32,12 @@
         "phpunit/phpunit": "^10.1",
         "spatie/laravel-ignition": "^2.0"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/farpat/laravel-ide-macros"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",

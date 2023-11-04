@@ -10,19 +10,21 @@ import {
 } from "antd";
 import { useStateContext } from "../../contexts/ContextProvider.jsx";
 import { useEffect, useState } from "react";
-import { DeleteFilled, EditFilled } from "@ant-design/icons";
+import {
+  QuestionCircleOutlined,
+  SendOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
-import RoleCreateForm from "../../components/forms/RoleCreateForm.jsx";
-import RoleUpdateForm from "../../components/forms/RoleUpdateForm.jsx";
 import { useNavigate } from "react-router-dom";
+import InvitationCreateForm from "../../components/forms/InvitationCreateForm.jsx";
 
-const RolesList = () => {
+const InvitationsList = () => {
   const navigate = useNavigate();
-  const { can } = useStateContext();
+  const { can, currentUser } = useStateContext();
   const [openCreateForm, setOpenCreateForm] = useState(false);
-  const [openUpdateForm, setOpenUpdateForm] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [role, setRole] = useState({});
+  const [invitations, setInvitations] = useState([]);
+  const [invitation, setInvitation] = useState({});
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [errors, setErrors] = useState({});
@@ -37,45 +39,63 @@ const RolesList = () => {
 
   const getColumns = () => [
     {
-      title: "ID",
-      dataIndex: "id",
+      title: "Sender",
+      dataIndex: "sender",
       sorter: true,
+      render: (_, { sender }) =>
+        sender.email === currentUser.email
+          ? "You"
+          : sender.first_name + " " + sender.last_name,
     },
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Invitee",
+      dataIndex: "invitee",
       sorter: true,
+      render: (_, { invitee }) =>
+        typeof invitee === "object"
+          ? invitee.first_name + " " + invitee.last_name
+          : invitee,
     },
     {
-      title: "Permissions",
-      dataIndex: "permissions",
+      title: "Allowed roles",
+      dataIndex: "allowed_roles",
       sorter: true,
-      render: (_, { permissions }) => (
+      render: (_, { roles }) => (
         <Space size={[0, 4]} wrap>
-          {permissions.length > 0 ? (
-            permissions.map((permission) => {
-              return (
-                <Tag color="#389e0d" key={permission.name}>
-                  {permission.display_name.toUpperCase()}
-                </Tag>
-              );
-            })
-          ) : (
-            <Tag color="#389e0d" key="all">
-              All
-            </Tag>
-          )}
+          {roles.map((role) => {
+            return (
+              <Tag color="#389e0d" key={role.name}>
+                {role.name.toUpperCase()}
+              </Tag>
+            );
+          })}
         </Space>
       ),
     },
     {
-      title: "Created At",
-      dataIndex: "created_at",
+      title: "Status",
+      dataIndex: "status",
       sorter: true,
+      render: (_, { id, state }) => (
+        <Tag
+          color={
+            {
+              expired: "red",
+              pending: "",
+              accepted: "green",
+              declined: "red",
+              revoked: "red",
+            }[state]
+          }
+          key={id}
+        >
+          {state}
+        </Tag>
+      ),
     },
     {
-      title: "Updated At",
-      dataIndex: "updated_at",
+      title: "Sent At",
+      dataIndex: "created_at",
       sorter: true,
     },
     {
@@ -84,27 +104,36 @@ const RolesList = () => {
       width: 80,
       render: (_, render) => (
         <Space size="small">
-          {can("roles.update") && render.name !== "Super Admin" && (
-            <Tooltip placement="top" title="Edit">
-              <Button
-                size="small"
-                onClick={() => showUpdateRoleForm(render.id)}
-                icon={<EditFilled style={{ color: "#456cec" }} />}
-              />
-            </Tooltip>
-          )}
-          {can("roles.destroy") && render.name !== "Super Admin" && (
+          {can("invitations.resend") && (
             <Popconfirm
               placement="topLeft"
-              title="Are you sure to delete this role"
-              onConfirm={() => handleRoleDelete(render.id)}
+              icon={<QuestionCircleOutlined style={{ color: "green" }} />}
+              title="Are you sure to resend this invitation?"
+              onConfirm={() => handleResendInvitation(render.id)}
               okText="Yes"
               cancelText="No"
             >
-              <Tooltip placement="top" title="Delete">
+              <Tooltip placement="top" title="Resend">
                 <Button
                   size="small"
-                  icon={<DeleteFilled style={{ color: "#ec4545" }} />}
+                  icon={<SendOutlined style={{ color: "green" }} />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
+          {can("invitations.revoke") && (
+            <Popconfirm
+              placement="topLeft"
+              icon={<QuestionCircleOutlined style={{ color: "#ec4545" }} />}
+              title="Are you sure to revoke this invitation?"
+              onConfirm={() => handleRevokeInvitation(render.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip placement="top" title="Revoke">
+                <Button
+                  size="small"
+                  icon={<StopOutlined style={{ color: "#ec4545" }} />}
                 />
               </Tooltip>
             </Popconfirm>
@@ -115,21 +144,21 @@ const RolesList = () => {
   ];
 
   useEffect(() => {
-    if (!can("roles.index")) {
+    if (!can("invitations.index")) {
       navigate("/forbidden");
     }
 
-    getRoles();
+    getInvitations();
   }, [JSON.stringify(tableParams)]);
 
-  const getRoles = () => {
+  const getInvitations = () => {
     setLoading(true);
     axiosClient
-      .get("/roles", {
+      .get("/invitations", {
         params: getTableParams(tableParams),
       })
       .then(({ data }) => {
-        setRoles(data.data);
+        setInvitations(data.data);
         setLoading(false);
         setTableParams({
           ...tableParams,
@@ -156,7 +185,7 @@ const RolesList = () => {
     });
 
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setRoles([]);
+      setInvitations([]);
     }
   };
 
@@ -164,16 +193,16 @@ const RolesList = () => {
     ...params,
   });
 
-  // Handle user creating.
-  const handleRoleCreate = (values) => {
+  // Handle invitation creating.
+  const handleInvitationCreate = (values) => {
     showLoadingMessage("Creating...");
 
     axiosClient
-      .post("/roles", values)
+      .post("/invitations/send", values)
       .then(({ data }) => {
         setOpenCreateForm(false);
-        getRoles();
-        showMessage("success", "Role successfully created!");
+        getInvitations();
+        showMessage("success", "Invitation successfully sent!");
       })
       .catch(({ response }) => {
         const err = response?.data?.errors;
@@ -182,33 +211,18 @@ const RolesList = () => {
         }
         const msg = response?.data?.message;
         if (msg && !err) {
-          showMessage("error", "Failed to create role: " + msg);
+          showMessage("error", "Failed to sent invitation: " + msg);
         }
       });
   };
 
-  const showUpdateRoleForm = (roleId) => {
-    axiosClient
-      .get("/roles/" + roleId)
-      .then(({ data }) => {
-        setRole(data);
-        setOpenUpdateForm(true);
-      })
-      .catch(({ response }) => {
-        showMessage("error", response?.data?.message);
-      });
-  };
-
-  // Handle user updating.
-  const handleRoleUpdate = (roleId, values) => {
-    showLoadingMessage("Updating...");
+  const handleResendInvitation = (invitationID) => {
+    showLoadingMessage("Resending...");
 
     axiosClient
-      .put("/roles/" + roleId, values)
+      .post("/invitations/resend/" + invitationID)
       .then(({ data }) => {
-        setOpenUpdateForm(false);
-        getRoles();
-        showMessage("success", "Role successfully updated!");
+        showMessage("success", "Invitation successfully resent!");
       })
       .catch(({ response }) => {
         const err = response?.data?.errors;
@@ -217,24 +231,33 @@ const RolesList = () => {
         }
         const msg = response?.data?.message;
         if (msg && !err) {
-          showMessage("error", "Failed to update role: " + msg);
+          showMessage("error", "Failed to resent invitation: " + msg);
         }
       });
+
+    getInvitations();
   };
 
-  // Handle user deleting.
-  const handleRoleDelete = (roleId) => {
-    showLoadingMessage("Deleting...");
+  const handleRevokeInvitation = (invitationID) => {
+    showLoadingMessage("Revoking...");
 
     axiosClient
-      .delete("/roles/" + roleId)
+      .post("/invitations/revoke/" + invitationID)
       .then(({ data }) => {
-        getRoles();
-        showMessage("success", "Role successfully deleted!");
+        showMessage("success", "Invitation successfully revoked!");
       })
       .catch(({ response }) => {
-        showMessage("error", "Failed to delete user: ");
+        const err = response?.data?.errors;
+        if (err) {
+          setErrors(err);
+        }
+        const msg = response?.data?.message;
+        if (msg && !err) {
+          showMessage("error", "Failed to revoked invitation: " + msg);
+        }
       });
+
+    getInvitations();
   };
 
   const handleErrors = () => {
@@ -260,9 +283,9 @@ const RolesList = () => {
   return (
     <Card
       type="inner"
-      title="Roles"
+      title="Invitations"
       extra={
-        can("roles.store") ? (
+        can("invitations.send") ? (
           <Button
             size="small"
             type="primary"
@@ -283,7 +306,7 @@ const RolesList = () => {
         }}
         columns={getColumns()}
         rowKey={(record) => record.id}
-        dataSource={roles}
+        dataSource={invitations}
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
@@ -291,18 +314,9 @@ const RolesList = () => {
         size="small"
       />
 
-      <RoleUpdateForm
-        open={openUpdateForm}
-        role={role}
-        onUpdate={handleRoleUpdate}
-        onCancel={() => setOpenUpdateForm(false)}
-        errors={errors}
-        onError={handleErrors}
-      />
-
-      <RoleCreateForm
+      <InvitationCreateForm
         open={openCreateForm}
-        onCreate={handleRoleCreate}
+        onCreate={handleInvitationCreate}
         onCancel={() => setOpenCreateForm(false)}
         errors={errors}
         onError={handleErrors}
@@ -311,4 +325,4 @@ const RolesList = () => {
   );
 };
 
-export default RolesList;
+export default InvitationsList;

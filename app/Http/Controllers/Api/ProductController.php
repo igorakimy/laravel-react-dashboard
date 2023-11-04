@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Actions\Api\Product\DeleteProduct;
 use App\Actions\Api\Product\FetchPaginatedProducts;
 use App\Actions\Api\Product\DeleteProductImage;
+use App\Actions\Api\Product\FetchProductsForSelect;
 use App\Actions\Api\Product\ShowProduct;
 use App\Actions\Api\Product\StoreProduct;
 use App\Actions\Api\Product\UpdateProduct;
@@ -29,6 +30,7 @@ final class ProductController extends ApiController
 {
     public function __construct(
         private readonly FetchPaginatedProducts $fetchPaginatedProductsAction,
+        private readonly FetchProductsForSelect $fetchProductsForSelectAction,
         private readonly ShowProduct $showProductAction,
         private readonly StoreProduct $storeProductAction,
         private readonly UpdateProduct $updateProductAction,
@@ -51,11 +53,18 @@ final class ProductController extends ApiController
         $sorting = ProductSortingData::fromRequest($request);
         $filtering = ProductFilteringData::fromRequest($request);
 
-        $products = $this->fetchPaginatedProductsAction->handle(
-            $pagination,
-            $sorting,
-            $filtering
-        );
+        if ($request->input('kind') === 'select') {
+            $products = $this->fetchProductsForSelectAction->handle(
+                sorting: $sorting,
+                filtering: $filtering,
+            );
+        } else {
+            $products = $this->fetchPaginatedProductsAction->handle(
+                pagination: $pagination,
+                sorting: $sorting,
+                filtering: $filtering,
+            );
+        }
 
         return response($products);
     }
@@ -143,7 +152,7 @@ final class ProductController extends ApiController
 
         $uuid = $media?->uuid;
 
-        return response(['uuid' => $uuid], 200);
+        return response(['uuid' => $uuid], RespCode::HTTP_OK);
     }
 
     /**
@@ -159,6 +168,6 @@ final class ProductController extends ApiController
     {
         $this->deleteProductImageAction->handle($product, $uuid);
 
-        return response('', 204);
+        return response('', RespCode::HTTP_NO_CONTENT);
     }
 }

@@ -2,36 +2,57 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Api\Invitation\ShowInvitation;
+use App\Data\Auth\RegisterData;
 use App\Data\Auth\UserData;
+use App\Exceptions\InvitationException;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Api\Auth\LoginRequest;
-use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
 
 final class AuthController extends ApiController
 {
+    public function __construct(
+       private readonly ShowInvitation $showInvitationAction,
+    ) {
+    }
+
     /**
      * User registration.
      *
-     * @param  RegisterRequest  $request
+     * @param  Request  $request
+     * @param  string  $token
      *
      * @return Response
+     * @throws InvitationException
      */
-    public function register(RegisterRequest $request)
+    public function register(Request $request, string $token)
     {
-        $data = $request->validated();
+        $data = RegisterData::fromRequest($request);
+
+        $invitation = $this->showInvitationAction->handle($token);
 
         /** @var User $user */
         $user = User::query()->create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
+            'first_name' => $data->first_name,
+            'last_name'  => $data->last_name,
+            'email'      => $data->email,
+            'password'   => $data->password,
         ]);
 
-        $token = $user?->createToken('main')->plainTextToken;
+        $user->assignRole(...$invitation->allowedRoles);
+
+        $invitation->update([
+            'invitee_id' => $user->id,
+            'accepted_at' => Carbon::now(),
+        ]);
+
+        $token = $user->createToken('main')->plainTextToken;
+
+        auth()->login($user);
 
         return response(compact('user', 'token'));
     }

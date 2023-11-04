@@ -25,6 +25,12 @@ enum Permission: string
     case CAN_DELETE_PERMISSION = 'permissions.destroy';
     case CAN_READ_LIST_PERMISSIONS = 'permissions.index';
 
+    // Invitations
+    case CAN_SEND_INVITATION = 'invitations.send';
+    case CAN_RESEND_INVITATION = 'invitations.resend';
+    case CAN_REVOKE_INVITATION = 'invitations.revoke';
+    case CAN_READ_LIST_INVITATIONS = 'invitations.index';
+
     // Categories
     case CAN_READ_CATEGORY = 'categories.show';
     case CAN_CREATE_CATEGORY = 'categories.store';
@@ -71,6 +77,11 @@ enum Permission: string
             self::CAN_UPDATE_PERMISSION => 'Update Permission',
             self::CAN_DELETE_PERMISSION => 'Delete Permission',
             self::CAN_READ_LIST_PERMISSIONS => 'Read All Permissions',
+
+            self::CAN_SEND_INVITATION => 'Send Invitation',
+            self::CAN_RESEND_INVITATION => 'Resend Invitation',
+            self::CAN_REVOKE_INVITATION => 'Revoke Invitation',
+            self::CAN_READ_LIST_INVITATIONS => 'Read All Invitations',
 
             self::CAN_READ_CATEGORY => 'Read Category',
             self::CAN_CREATE_CATEGORY => 'Create Category',
