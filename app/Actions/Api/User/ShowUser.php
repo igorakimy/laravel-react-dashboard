@@ -16,6 +16,7 @@ final class ShowUser extends Data
 
         $user->load(['roles', 'roles.permissions', 'phones']);
 
-        return UserData::from($user);
+        return UserData::from($user)
+                       ->include('phones', 'roles');
     }
 }

@@ -11,6 +11,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 class UserData extends Data
@@ -24,9 +25,9 @@ class UserData extends Data
         public UserStatus $status,
 
         #[DataCollectionOf(RoleData::class)]
-        public DataCollection $roles,
+        public Lazy|DataCollection $roles,
 
-        public array $phones,
+        public Lazy|array $phones,
 
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d H:i:s')]
         public ?Carbon $created_at,
@@ -44,11 +45,11 @@ class UserData extends Data
             full_name: $user->full_name->toString(),
             email: $user->email,
             status: $user->status,
-            roles: RoleData::collection($user->roles),
-            phones: PhoneData::collection($user->phones)
+            roles: Lazy::create(fn() => RoleData::collection($user->roles)),
+            phones: Lazy::create(fn() => PhoneData::collection($user->phones)
                              ->toCollection()
                              ->pluck('number')
-                             ->toArray(),
+                             ->toArray()),
             created_at: $user->created_at,
             updated_at: $user->updated_at,
         );

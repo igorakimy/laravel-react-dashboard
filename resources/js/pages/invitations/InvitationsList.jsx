@@ -52,9 +52,7 @@ const InvitationsList = () => {
       dataIndex: "invitee",
       sorter: true,
       render: (_, { invitee }) =>
-        typeof invitee === "object"
-          ? invitee.first_name + " " + invitee.last_name
-          : invitee,
+        typeof invitee === "object" ? invitee.email : invitee,
     },
     {
       title: "Allowed roles",

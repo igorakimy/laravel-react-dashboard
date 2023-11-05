@@ -9,6 +9,7 @@ use App\Actions\Api\Invitation\SendInvitation;
 use App\Data\Invitation\InvitationData;
 use App\Data\Invitation\InvitationPaginationData;
 use App\Data\Invitation\InvitationSendingData;
+use App\Data\Invitation\InvitationSortingData;
 use App\Exceptions\InvitationException;
 use App\Http\Controllers\ApiController;
 use App\Models\Invitation;
@@ -36,7 +37,12 @@ final class InvitationController extends ApiController
     {
         $pagination = InvitationPaginationData::fromRequest($request);
 
-        $invitations = $this->fetchPaginatedInvitationsAction->handle($pagination);
+        $sorting = InvitationSortingData::fromRequest($request);
+
+        $invitations = $this->fetchPaginatedInvitationsAction->handle(
+            pagination: $pagination,
+            sorting: $sorting
+        );
 
         return response($invitations);
     }

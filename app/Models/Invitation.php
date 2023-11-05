@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -45,6 +46,9 @@ use Illuminate\Support\Str;
  * @method static Builder|Invitation whereSenderId($value)
  * @method static Builder|Invitation whereUpdatedAt($value)
  * @method static Builder|Invitation whereUrlToken($value)
+ * @method static Builder|Invitation orderByInvitee(string $direction = 'asc')
+ * @method static Builder|Invitation orderByRoles(string $direction = 'asc')
+ * @method static Builder|Invitation orderBySender(string $direction = 'asc')
  * @mixin \Eloquent
  */
 class Invitation extends Model
@@ -66,10 +70,10 @@ class Invitation extends Model
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime',
+        'expires_at'  => 'datetime',
         'accepted_at' => 'datetime',
         'declined_at' => 'datetime',
-        'revoked_at' => 'datetime',
+        'revoked_at'  => 'datetime',
     ];
 
     // =================== //
@@ -113,15 +117,92 @@ class Invitation extends Model
     // ================ //
 
     /**
-     * Get all pending invites.
+     * Scope a query to only include pending invitations.
      *
-     * @param Builder $query
+     * @param  Builder  $query
+     *
      * @return Builder
      */
     public function scopePending(Builder $query): Builder
     {
         return $query->whereNull(['accepted_at', 'declined_at'])
                      ->whereDate('expires_at', '>=', Carbon::now());
+    }
+
+    /**
+     * Scope a query to order invitations by sender.
+     *
+     * @param  Builder  $query
+     * @param  string  $direction
+     *
+     * @return void
+     */
+    public function scopeOrderBySender(Builder $query, string $direction = 'asc'): void
+    {
+        $query->orderBy(
+            User::query()->selectRaw("CONCAT(first_name, ' ', last_name)")
+                ->whereColumn('users.id', '=', 'invitations.sender_id'),
+            $direction
+        );
+    }
+
+    /**
+     * Scope a query to order invitations by invitee.
+     *
+     * @param  Builder  $query
+     * @param  string  $direction
+     *
+     * @return void
+     */
+    public function scopeOrderByInvitee(Builder $query, string $direction = 'asc'): void
+    {
+        if ($this->invitee) {
+            $query->orderBy(
+                User::query()->select('email')
+                    ->whereColumn('users.id', '=', 'invitations.invitee_id'),
+                $direction
+            );
+        } else {
+            $query->orderBy('email', $direction);
+        }
+    }
+
+    /**
+     * Scope a query to order invitations by state.
+     *
+     * @param  Builder  $query
+     * @param  string  $direction
+     *
+     * @return void
+     */
+    public function scopeOrderByStatus(Builder $query, string $direction = 'asc'): void
+    {
+        $sorted = self::get()
+                       ->sortBy(function ($el) {
+                           return $el->state->value;
+                       }, SORT_STRING, $direction === 'desc')
+                       ->pluck('id')
+                       ->toArray();
+
+
+        $orderedIDs = implode(', ', $sorted);
+
+        $rawSql = DB::raw("unnest(array[$orderedIDs]) WITH ORDINALITY AS t(id, ord)");
+        $query->join($rawSql, 'invitations.id', '=', 't.id')
+              ->orderBy('t.ord');
+    }
+
+    /**
+     * Scope a query to order invitations by allowed roles.
+     *
+     * @param  Builder  $query
+     * @param  string  $direction
+     *
+     * @return void
+     */
+    public function scopeOrderByRoles(Builder $query, string $direction = 'asc'): void
+    {
+        $query->orderBy('allowedRoles.name', $direction);
     }
 
     // ======================= //

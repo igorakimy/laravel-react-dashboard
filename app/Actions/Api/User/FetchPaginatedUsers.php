@@ -3,20 +3,46 @@
 namespace App\Actions\Api\User;
 
 use App\Actions\Api\ApiAction;
+use App\Data\SortingData;
 use App\Data\User\UserData;
 use App\Data\User\UserPaginationData;
 use App\Data\User\UserSortingData;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\LaravelData\PaginatedDataCollection;
 
 final class FetchPaginatedUsers extends ApiAction
 {
     public function handle(UserPaginationData $pagination, UserSortingData $sorting): PaginatedDataCollection
     {
-        $query = User::query()->with(['roles', 'roles.permissions', 'phones']);
+        $query = User::query()->with($this->getRelations());
 
-        // apply sorting.
+        $query = $this->applySorting($query, $sorting);
+
+        $users = $query->paginate(
+            $pagination->pageSize,
+            $pagination->columns,
+            $pagination->pageName,
+            $pagination->currentPage
+        );
+
+        return UserData::collection($users)->include(
+            'roles',
+            'phones'
+        );
+    }
+
+    /**
+     * Apply sorting.
+     *
+     * @param  Builder  $query
+     * @param  SortingData  $sorting
+     *
+     * @return Builder
+     */
+    private function applySorting(Builder $query, SortingData $sorting): Builder
+    {
         if ($sorting->column == 'roles') {
             $query->orderBy(
                 Role::query()->selectRaw('STRING_AGG(name, \', \')')
@@ -31,14 +57,20 @@ final class FetchPaginatedUsers extends ApiAction
             $query->orderBy($sorting->column, $sorting->direction);
         }
 
-        // paginate.
-        $users = $query->paginate(
-            $pagination->pageSize,
-            $pagination->columns,
-            $pagination->pageName,
-            $pagination->currentPage
-        );
+        return $query;
+    }
 
-        return UserData::collection($users);
+    /**
+     * Get user relations list.
+     *
+     * @return string[]
+     */
+    private function getRelations(): array
+    {
+        return [
+            'roles',
+            'roles.permissions',
+            'phones'
+        ];
     }
 }

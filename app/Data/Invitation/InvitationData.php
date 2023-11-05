@@ -61,7 +61,7 @@ final class InvitationData extends Data
             email: $invitation->email,
             url_token: $invitation->url_token,
             sender: Lazy::create(fn() => UserData::from($invitation->sender)),
-            invitee: Lazy::create(fn() => $invitation->invitee ? UserData::from($invitation->invitee) : $invitation->email),
+            invitee: Lazy::create(fn() => $invitation->invitee ? UserData::from($invitation->invitee) : $invitation->email)->defaultIncluded(),
             roles: Lazy::create(fn() => RoleData::collection($invitation->allowedRoles)),
             message_text: $invitation->message_text,
             state: $invitation->state,
