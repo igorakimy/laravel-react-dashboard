@@ -16,8 +16,7 @@ final class ShowRole extends Data
                         ->findOrFail($role);
         }
 
-        $role->load('permissions');
-
-        return RoleData::from($role);
+        return RoleData::from($role)
+                       ->include('permissions');
     }
 }

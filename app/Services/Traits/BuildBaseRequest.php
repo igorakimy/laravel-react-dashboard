@@ -22,9 +22,7 @@ trait BuildBaseRequest
             $baseUrl = $this->withBaseUrl();
         }
 
-        return $baseUrl->timeout(
-            seconds: $this->timeout ?? 1
-        );
+        return $baseUrl->timeout($this->timeout ?? 1);
     }
 
     /**
@@ -34,11 +32,10 @@ trait BuildBaseRequest
      */
     public function buildRequestWithToken(): PendingRequest
     {
-        return $this->withBaseUrl()->timeout(
-            seconds: $this->timeout ?? 0
-        )->withToken(
-            token: $this->apiToken()
-        );
+        return $this
+            ->withBaseUrl()
+            ->timeout($this->timeout ?? 1)
+            ->withHeader('Authorization', $this->apiToken());
     }
 
     /**
@@ -50,9 +47,7 @@ trait BuildBaseRequest
      */
     public function withCustomBaseUrl(string $url): PendingRequest
     {
-        return Http::baseUrl(
-            url: $url
-        );
+        return Http::baseUrl($url);
     }
 
     /**
@@ -62,8 +57,6 @@ trait BuildBaseRequest
      */
     public function withBaseUrl(): PendingRequest
     {
-        return Http::baseUrl(
-            url: $this->apiUrl()
-        );
+        return Http::baseUrl($this->apiUrl());
     }
 }

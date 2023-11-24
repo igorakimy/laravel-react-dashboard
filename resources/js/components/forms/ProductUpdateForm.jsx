@@ -11,6 +11,7 @@ import {
   Row,
   Select,
   Space,
+  Switch,
   Tabs,
   Typography,
   Upload,
@@ -19,6 +20,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../axios-client.js";
 import TextArea from "antd/es/input/TextArea";
 import { InboxOutlined } from "@ant-design/icons";
+import ComponentsTable from "../tables/ComponentsTable.jsx";
 
 const ProductUpdateForm = ({
   open,
@@ -45,6 +47,8 @@ const ProductUpdateForm = ({
   const [catalogFileList, setCatalogFileList] = useState([]);
   const [productFileList, setProductFileList] = useState([]);
   const [vectorFileList, setVectorFileList] = useState([]);
+
+  const [componentsOpen, setComponentsOpen] = useState(false);
 
   const { Title } = Typography;
   const { Dragger } = Upload;
@@ -344,6 +348,10 @@ const ProductUpdateForm = ({
         },
       ]);
     });
+  };
+
+  const handleProductIsComposite = (value) => {
+    setComponentsOpen(value);
   };
 
   return (
@@ -878,6 +886,21 @@ const ProductUpdateForm = ({
                   />
                 </Modal>
               </Space>
+            ),
+          },
+          {
+            key: "3",
+            label: "Components",
+            children: (
+              <>
+                <Switch
+                  checkedChildren="Composite Product"
+                  unCheckedChildren="Simple Product"
+                  onChange={handleProductIsComposite}
+                  size="default"
+                />
+                <ComponentsTable open={componentsOpen} product={product} />
+              </>
             ),
           },
         ]}

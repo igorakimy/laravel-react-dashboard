@@ -3,9 +3,14 @@
 namespace App\Services\ZohoBooks;
 
 use App\Services\Traits\BuildBaseRequest;
+use App\Services\Traits\CanSendDeleteRequest;
 use App\Services\Traits\CanSendGetRequest;
 use App\Services\Traits\CanSendPostRequest;
+use App\Services\Traits\CanSendPutRequest;
+use App\Services\ZohoBooks\Resources\DocumentResource;
+use App\Services\ZohoBooks\Resources\ItemResource;
 use App\Services\ZohoBooks\Resources\OauthResource;
+use App\Services\ZohoBooks\Resources\SettingResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -15,12 +20,38 @@ final class ZohoBooksService
     use BuildBaseRequest;
     use CanSendGetRequest;
     use CanSendPostRequest;
+    use CanSendPutRequest;
+    use CanSendDeleteRequest;
 
     /**
      * @var string
      */
     public string $grantCode;
 
+    /**
+     * @var string
+     */
+    private string $apiVersion = 'v3';
+
+    /**
+     * @var string
+     */
+    private string $accessToken;
+
+    /**
+     * Constructor.
+     *
+     * @param  string|null  $clientID
+     * @param  string|null  $clientSecret
+     * @param  string|null  $redirectUri
+     * @param  string|null  $organizationID
+     * @param  string  $domain
+     * @param  array  $scopes
+     * @param  int  $timeout
+     * @param  string  $accessTokenCacheKey
+     * @param  string  $refreshTokenCacheKey
+     * @param  bool  $useCache
+     */
     public function __construct(
         public ?string $clientID,
         public ?string $clientSecret,
@@ -31,6 +62,7 @@ final class ZohoBooksService
         public int $timeout = 10,
         public string $accessTokenCacheKey = 'zoho_books_access_token',
         public string $refreshTokenCacheKey = 'zoho_books_refresh_token',
+        public bool $useCache = false,
     ) {
     }
 
@@ -41,7 +73,7 @@ final class ZohoBooksService
      */
     public function apiUrl(): string
     {
-        return 'https://books.zoho.'.$this->domain;
+        return 'https://www.zohoapis.'.$this->domain.'/books/'.$this->apiVersion;
     }
 
     /**
@@ -73,7 +105,11 @@ final class ZohoBooksService
      */
     public function apiToken(): string
     {
-        return 'Zoho-oauthtoken '.$this->getTokenFromCache($this->accessTokenCacheKey);
+        $accessToken = $this->useCache
+            ? $this->getTokenFromCache($this->accessTokenCacheKey)
+            : $this->getAccessToken();
+
+        return 'Zoho-oauthtoken '.$accessToken;
     }
 
     /**
@@ -111,19 +147,79 @@ final class ZohoBooksService
         return new OauthResource($this);
     }
 
+    /*
+     * Get items resource.
+     */
+    public function items(): ItemResource
+    {
+        return new ItemResource($this);
+    }
+
+    /*
+     * Get documents resource.
+     */
+    public function documents(): DocumentResource
+    {
+        return new DocumentResource($this);
+    }
+
+    /**
+     * Get settings resource.
+     *
+     * @return SettingResource
+     */
+    public function settings(): SettingResource
+    {
+        return new SettingResource($this);
+    }
+
+    /**
+     * Get api version.
+     *
+     * @return string
+     */
+    public function getApiVersion(): string
+    {
+        return $this->apiVersion;
+    }
+
+    /**
+     * Get access token.
+     *
+     * @return string
+     */
+    public function getAccessToken(): string
+    {
+        return $this->accessToken ?? '';
+    }
+
+    /**
+     * Set new access token.
+     *
+     * @param  string  $token
+     *
+     * @return void
+     */
+    public function setAccessToken(string $token): void
+    {
+        $this->accessToken = $token;
+    }
+
     /**
      * Get token from cache.
      *
      * @param  string  $tokenKey
      *
-     * @return string
+     * @return string|null
      */
-    public function getTokenFromCache(string $tokenKey): string
+    public function getTokenFromCache(string $tokenKey): ?string
     {
         return Cache::get($tokenKey);
     }
 
     /**
+     * Store token to cache.
+     *
      * @param  string  $tokenKey
      * @param  string  $token
      * @param  Carbon  $time

@@ -45,7 +45,7 @@ table {
 
 /* Main styles */
 
-html, body, #app, #app > div {
+html, body {
     height: 100%;
 }
 

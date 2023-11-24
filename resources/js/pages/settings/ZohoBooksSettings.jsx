@@ -1,10 +1,25 @@
-import { Button, Card, Form, Input, message, Select, Space } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  message,
+  Row,
+  Select,
+  Space,
+} from "antd";
 import { useEffect, useState } from "react";
 import axiosClient from "../../axios-client.js";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Option } from "antd/es/mentions/index";
 
 const ZohoBooksSettings = () => {
   const [externalPopup, setExternalPopup] = useState(null);
   const [authUrl, setAuthUrl] = useState("");
+  const [localFields, setLocalFields] = useState([]);
+  const [integrationFields, setIntegrationFields] = useState([]);
+  const [mappedFields, setMappedFields] = useState([]);
   const [refreshToken, setRefreshToken] = useState(
     localStorage.getItem("zoho_books_refresh_token"),
   );
@@ -15,10 +30,23 @@ const ZohoBooksSettings = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
+  const [fieldsMappingForm] = Form.useForm();
 
   useEffect(() => {
     getAuthUrl();
     getSettings();
+    getLocalFields();
+    getMappedFields("zoho-books");
+    getIntegrationFields("zoho-books");
+
+    mappedFields.map((field, index) => {
+      const currentValues = fieldsMappingForm.getFieldsValue(true);
+      currentValues[`fields[${index}].local_field`] =
+        field.local_field === null ? 0 : field.local_field.id;
+      currentValues[`fields[${index}].integration_field`] =
+        field.integration_field.id;
+      fieldsMappingForm.setFieldsValue(currentValues);
+    });
   }, []);
 
   useEffect(() => {
@@ -42,6 +70,7 @@ const ZohoBooksSettings = () => {
       const error = searchParams.get("error");
       if (code) {
         externalPopup.close();
+        showLoadingMessage("Connecting...");
         axiosClient
           .get("/integrations/zoho-books/callback?code=" + code)
           .then((response) => {
@@ -59,6 +88,7 @@ const ZohoBooksSettings = () => {
               setExternalPopup(null);
               timer && clearInterval(timer);
               messageApi.success("Zoho Books successfully connected!");
+              getIntegrationFields("zoho-books");
             }
           })
           .catch((err) => {
@@ -78,6 +108,14 @@ const ZohoBooksSettings = () => {
     }, 300);
   }, [externalPopup]);
 
+  const showLoadingMessage = (content) => {
+    messageApi.open({
+      key: "updatable",
+      type: "loading",
+      content: content,
+    });
+  };
+
   const getAuthUrl = () => {
     axiosClient
       .get("/integrations/zoho-books/authenticate")
@@ -95,6 +133,60 @@ const ZohoBooksSettings = () => {
       .then((response) => {
         // console.log(response.data);
         setSettings(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getLocalFields = () => {
+    axiosClient
+      .get("/local-fields")
+      .then((response) => {
+        setLocalFields(response.data);
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getIntegrationFields = (integration) => {
+    axiosClient
+      .get("/integration-fields/" + integration)
+      .then((response) => {
+        setIntegrationFields(response.data.data);
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getMappedFields = (integration) => {
+    axiosClient
+      .get("/integration-fields/mapped/" + integration)
+      .then((response) => {
+        setMappedFields(response.data);
+        console.log(
+          response.data.map((field) => {
+            return {
+              local_field:
+                field.local_field === null ? 0 : field.local_field.id,
+              integration_field: field.integration_field.id,
+            };
+          }),
+        );
+        console.log([
+          {
+            local_field: 0,
+            integration_field: 4,
+          },
+          {
+            local_field: 5,
+            integration_field: 2,
+          },
+        ]);
       })
       .catch((err) => {
         console.log(err);
@@ -139,62 +231,242 @@ const ZohoBooksSettings = () => {
     });
   };
 
+  const handleFieldsMapping = () => {
+    fieldsMappingForm
+      .validateFields()
+      .then((values) => {
+        axiosClient
+          .post("/integration-fields/mapping/zoho-books", values)
+          .then((response) => {
+            messageApi.success("Zoho Books fields successfully mapped!");
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
-    <Card
-      type="inner"
-      title="Zoho Books"
-      extra={
-        <Space>
-          {refreshToken && Date.now() / 1000 < expireToken ? (
-            <Button
-              onClick={handleDisconnectZohoBooks}
-              type="primary"
-              style={{
-                backgroundColor: "#ff4d4f",
-              }}
-            >
-              Disconnect
-            </Button>
-          ) : (
-            <Button onClick={handleConnectZohoBooks} type="primary">
-              Connect
-            </Button>
-          )}
-          <Button
-            type="primary"
-            onClick={handleSaveZohoBooksConfig}
-            style={{ backgroundColor: "green" }}
-          >
-            Save
-          </Button>
-        </Space>
-      }
+    <Space
+      direction="vertical"
+      size="middle"
+      style={{ width: 800, display: "flex" }}
     >
       {contextHolder}
 
-      <Form
-        form={form}
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 20 }}
-        labelAlign="left"
-      >
-        {Object.keys(settings).map((key) => {
-          return (
-            <Form.Item
-              name={key}
-              label={key[0].toUpperCase() + key.split("_").join(" ").slice(1)}
-              initialValue={
-                Array.isArray(settings[key])
-                  ? settings[key].join(",")
-                  : settings[key]
-              }
+      <Card
+        type="inner"
+        title="Connection"
+        extra={
+          <Space>
+            {refreshToken && Date.now() / 1000 < expireToken ? (
+              <Button
+                onClick={handleDisconnectZohoBooks}
+                type="primary"
+                style={{
+                  backgroundColor: "#ff4d4f",
+                }}
+              >
+                Disconnect
+              </Button>
+            ) : (
+              <Button onClick={handleConnectZohoBooks} type="primary">
+                Connect
+              </Button>
+            )}
+            <Button
+              type="primary"
+              onClick={handleSaveZohoBooksConfig}
+              style={{ backgroundColor: "green" }}
             >
-              <Input />
-            </Form.Item>
-          );
-        })}
-      </Form>
-    </Card>
+              Save
+            </Button>
+          </Space>
+        }
+      >
+        <Form
+          form={form}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          labelAlign="left"
+        >
+          {Object.keys(settings).map((key) => {
+            return (
+              <Form.Item
+                name={key}
+                label={key[0].toUpperCase() + key.split("_").join(" ").slice(1)}
+                initialValue={
+                  Array.isArray(settings[key])
+                    ? settings[key].join(",")
+                    : settings[key]
+                }
+              >
+                <Input />
+              </Form.Item>
+            );
+          })}
+        </Form>
+      </Card>
+
+      <Card
+        type="inner"
+        title="Map Fields"
+        extra={
+          <Space>
+            <Button
+              type="primary"
+              onClick={handleFieldsMapping}
+              style={{ backgroundColor: "green" }}
+            >
+              Save
+            </Button>
+          </Space>
+        }
+      >
+        <Form name="fields_mapping" form={fieldsMappingForm} autoComplete="off">
+          <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Col span={11}>Local Field</Col>
+            <Col span={11}>Zoho Books Field</Col>
+            <Col span={2}>Action</Col>
+          </Row>
+
+          {/*<Row gutter={16}>*/}
+          {/*  <Col span={11}>*/}
+          {/*    <Form.Item*/}
+          {/*      name={["integration_fields", "local_field"]}*/}
+          {/*      initialValue="Primary Field"*/}
+          {/*      style={{*/}
+          {/*        disabled: true,*/}
+          {/*      }}*/}
+          {/*    >*/}
+          {/*      <Input />*/}
+          {/*    </Form.Item>*/}
+          {/*  </Col>*/}
+          {/*  <Col span={11}>*/}
+          {/*    <Form.Item*/}
+          {/*      name={["integration_fields", "integration_field"]}*/}
+          {/*      rules={[*/}
+          {/*        {*/}
+          {/*          required: true,*/}
+          {/*          message: "Missing Zoho Books field",*/}
+          {/*        },*/}
+          {/*      ]}*/}
+          {/*    >*/}
+          {/*      <Select defaultValue="a2" options={[]} />*/}
+          {/*    </Form.Item>*/}
+          {/*  </Col>*/}
+          {/*  <Col span={2}></Col>*/}
+          {/*</Row>*/}
+
+          <Form.List
+            name="fields"
+            // initialValue={[
+            //   {
+            //     local_field: 0,
+            //     integration_field: 4,
+            //   },
+            //   {
+            //     local_field: 5,
+            //     integration_field: 2,
+            //   },
+            // ]}
+
+            initialValue={
+              mappedFields.length > 0
+                ? mappedFields.map((field) => {
+                    return {
+                      local_field:
+                        field.local_field === null ? 0 : field.local_field.id,
+                      integration_field: field.integration_field.id,
+                    };
+                  })
+                : [
+                    {
+                      local_field: "Primary Field",
+                      integration_field: "",
+                    },
+                  ]
+            }
+          >
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...restField }) => (
+                  <span key={key}>
+                    <Row gutter={16}>
+                      <Col span={11}>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "local_field"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Missing local field",
+                            },
+                          ]}
+                        >
+                          {key === 0 ? (
+                            <Select disabled>
+                              <Option value={0}>Primary Field</Option>
+                            </Select>
+                          ) : (
+                            <Select
+                              options={localFields.map((field) => {
+                                return {
+                                  value: field.id,
+                                  label: field.name,
+                                };
+                              })}
+                            />
+                          )}
+                        </Form.Item>
+                      </Col>
+                      <Col span={11}>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "integration_field"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Missing Zoho Books field",
+                            },
+                          ]}
+                        >
+                          <Select
+                            options={integrationFields.map((field) => {
+                              return {
+                                value: field.id,
+                                label: field.name,
+                              };
+                            })}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={2}>
+                        {key === 0 ? (
+                          <></>
+                        ) : (
+                          <MinusCircleOutlined onClick={() => remove(name)} />
+                        )}
+                      </Col>
+                    </Row>
+                  </span>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Add field
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+        </Form>
+      </Card>
+    </Space>
   );
 };
 

@@ -25,6 +25,7 @@ class ZohoBooksServiceProvider extends ServiceProvider
                 organizationID: config('services.zoho_books.organization_id'),
                 domain: config('services.zoho_books.domain'),
                 scopes: config('services.zoho_books.scopes'),
+                useCache: config('services.zoho_books.use_cache'),
             );
         });
     }

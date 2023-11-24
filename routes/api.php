@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\InvitationController;
+use App\Http\Controllers\Api\LocalFieldController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
@@ -12,6 +13,8 @@ use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ZohoBooksSettingsController;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Integration\IntegrationFieldController;
 use App\Http\Controllers\Integration\ZohoBooksController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,6 +96,20 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     Route::delete('/products/{product}/delete-media/{media}', [ProductController::class, 'deleteMedia'])
          ->name('products.delete_media');
 
+    /*
+     * Local product fields.
+     */
+    Route::apiResource('/local-fields', LocalFieldController::class)
+         ->only('index');
+
+    /**
+     * Integration product fields
+     */
+    Route::post('/integration-fields/mapping/{integration}', [IntegrationFieldController::class, 'mapping']);
+    Route::get('/integration-fields/mapped/{integration}', [IntegrationFieldController::class, 'mapped']);
+    Route::apiResource('/integration-fields/{integration}', IntegrationFieldController::class)
+         ->only('index');
+
     /**
      * Settings routes.
      */
@@ -129,4 +146,6 @@ Route::post('/login', [AuthController::class, 'login'])
  * Guest user routes.
  */
 Route::get('/statuses', [UserController::class, 'showStatuses']);
+
+Route::post('/test', [Controller::class, 'test']);
 

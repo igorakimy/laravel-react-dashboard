@@ -40,5 +40,6 @@ return [
         'scopes' => [
             'ZohoBooks.fullaccess.all',
         ],
+        'use_cache' => true,
     ],
 ];

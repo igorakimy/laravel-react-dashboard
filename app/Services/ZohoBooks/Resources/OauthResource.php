@@ -41,9 +41,13 @@ final class OauthResource
             customUrl: $this->service->accountsUrl()
         );
 
-        $response = $this->service->post($request, $url, $data);
+        $response = $this->service->post($request, $url, $data, true);
 
         $data = AccessTokenData::fromResponse($response);
+
+        if ( ! $this->service->useCache) {
+            return $data;
+        }
 
         if ($data->success) {
 
