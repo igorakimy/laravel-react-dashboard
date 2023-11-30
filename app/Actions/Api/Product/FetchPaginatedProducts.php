@@ -34,7 +34,10 @@ final class FetchPaginatedProducts extends ApiAction
             page: $pagination->currentPage
         );
 
-        return ProductData::collection($products);
+        return ProductData::collection($products)->include(
+            'type',
+            'categories'
+        );
     }
 
     /**

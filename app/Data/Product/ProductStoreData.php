@@ -3,19 +3,12 @@
 namespace App\Data\Product;
 
 use App\Data\Category\CategoryData;
-use App\Data\Color\ColorData;
-use App\Data\Material\MaterialData;
-use App\Data\Type\TypeData;
-use App\Data\Vendor\VendorData;
 use App\Models\Category;
-use App\Models\Color;
-use App\Models\Material;
-use App\Models\Type;
-use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Optional;
 
 class ProductStoreData extends Data
 {
@@ -37,10 +30,10 @@ class ProductStoreData extends Data
         public string|null $barcode,
         public string|null $location,
 
-        public ColorData|null $color,
-        public MaterialData|null $material,
-        public VendorData|null $vendor,
-        public TypeData|null $type,
+        public int|null|Optional $color_id,
+        public int|null|Optional $material_id,
+        public int|null|Optional $vendor_id,
+        public int|null $type_id,
 
         #[DataCollectionOf(CategoryData::class)]
         public DataCollection $categories,
@@ -70,10 +63,10 @@ class ProductStoreData extends Data
             weight: $request->input('weight'),
             barcode: $request->input('barcode'),
             location: $request->input('location'),
-            color: ColorData::from(Color::findOrFail($request->input('color'))),
-            material: MaterialData::from(Material::findOrFail($request->input('material'))),
-            vendor: VendorData::from(Vendor::findOrFail($request->input('vendor'))),
-            type: TypeData::from(Type::findOrFail($request->input('type'))),
+            color_id: $request->input('color_id', Optional::create()),
+            material_id: $request->input('material_id', Optional::create()),
+            vendor_id: $request->input('vendor_id', Optional::create()),
+            type_id: $request->input('type_id', Optional::create()),
             categories: CategoryData::collection(Category::findMany($request->input('categories'))),
             caption: $request->input('caption'),
             description: $request->input('description'),
@@ -97,10 +90,10 @@ class ProductStoreData extends Data
             'weight' => ['required', 'numeric', 'min:0'],
             'barcode' => ['nullable', 'string'],
             'location' => ['nullable', 'string'],
-            'color' => ['nullable', 'integer', 'exists:colors,id'],
-            'material' => ['nullable', 'integer', 'exists:materials,id'],
-            'vendor' => ['nullable', 'integer', 'exists:vendors,id'],
-            'type' => ['nullable', 'integer', 'exists:types,id'],
+            'color_id' => ['nullable', 'integer', 'exists:colors,id'],
+            'material_id' => ['nullable', 'integer', 'exists:materials,id'],
+            'vendor_id' => ['nullable', 'integer', 'exists:vendors,id'],
+            'type_id' => ['nullable', 'integer', 'exists:types,id'],
             'categories' => ['nullable', 'array'],
             'caption' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],

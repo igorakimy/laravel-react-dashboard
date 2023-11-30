@@ -28,6 +28,14 @@ final class ShowProduct extends Data
 
         $product->load($relations);
 
-        return ProductData::from($product);
+        return ProductData::from($product)->include(
+            'type',
+            'metas',
+            'color',
+            'media',
+            'vendor',
+            'material',
+            'categories',
+        );
     }
 }

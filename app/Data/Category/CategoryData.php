@@ -2,6 +2,7 @@
 
 namespace App\Data\Category;
 
+use App\Data\Meta\MetaData;
 use App\Models\Category;
 use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -23,6 +24,9 @@ final class CategoryData extends Data
 
         #[DataCollectionOf(CategoryData::class)]
         public DataCollection|Lazy|null $children,
+
+        #[DataCollectionOf(MetaData::class)]
+        public DataCollection|Lazy|null $metas,
 
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d H:i:s')]
         public ?Carbon $created_at,
@@ -49,6 +53,7 @@ final class CategoryData extends Data
                 $category,
                 fn() => CategoryData::collection($category->children)->include('children')
             ),
+            metas: Lazy::create(fn() => MetaData::collection($category->metas)),
             created_at: $category->created_at,
             updated_at: $category->updated_at
         );

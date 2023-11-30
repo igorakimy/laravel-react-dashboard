@@ -92,6 +92,16 @@ class Category extends Model
                     ->using(CategoryField::class);
     }
 
+    /**
+     * Category meta fields.
+     *
+     * @return HasMany
+     */
+    public function metas(): HasMany
+    {
+        return $this->hasMany(Meta::class);
+    }
+
     // ======================= //
     //      OTHER METHODS      //
     // ======================= //

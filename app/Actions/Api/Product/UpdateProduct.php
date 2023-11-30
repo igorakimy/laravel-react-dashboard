@@ -9,33 +9,37 @@ use App\Models\Product;
 
 final class UpdateProduct extends ApiAction
 {
+    public function __construct(
+        public readonly UpdateProductMetas $updateProductMetasAction,
+    ) {
+    }
+
     public function handle(
         Product $product,
         ProductUpdateData $data,
     ): ProductData {
 
-        $product->name = $data->name;
-        $product->sku = $data->sku;
-        $product->quantity = $data->quantity;
-        $product->cost_price = $data->cost_price;
-        $product->selling_price = $data->selling_price;
-        $product->margin = $data->margin;
-        $product->width = $data->width;
-        $product->height = $data->height;
-        $product->weight = $data->weight;
-        $product->barcode = $data->barcode;
-        $product->location = $data->location;
-        $product->color_id = $data->color->id;
-        $product->material_id = $data->material->id;
-        $product->vendor_id = $data->vendor->id;
-        $product->type_id = $data->type->id;
-        $product->caption = $data->caption;
-        $product->description = $data->description;
+        $product->fill($data->except(
+            'metas',
+            'categories',
+        )->toArray());
 
-        $product->save();
+        if($product->save()) {
+            $categoriesIds = $data->categories->toCollection()->pluck('id')->toArray();
 
-        $product->categories()->sync($data->categories->toCollection()->pluck('id')->toArray());
+            // sync categories
+            $product->categories()->sync($categoriesIds);
 
-        return ProductData::from($product);
+            // save/update meta fields values
+            $this->updateProductMetasAction->handle($product, $data->metas);
+        }
+
+        return ProductData::from($product)->include(
+            'type',
+            'color',
+            'metas',
+            'vendor',
+            'material',
+        );
     }
 }

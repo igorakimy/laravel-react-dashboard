@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\LocalFieldController;
 use App\Http\Controllers\Api\MaterialController;
+use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\MetaController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
@@ -66,6 +68,11 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Categories routes.
      */
     Route::apiResource('/categories', CategoryController::class);
+
+    /**
+     * Meta fields routes.
+     */
+    Route::apiResource('/metas', MetaController::class);
 
     /*
      * Colors routes.

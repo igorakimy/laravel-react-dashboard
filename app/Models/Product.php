@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
@@ -190,6 +192,29 @@ class Product extends Model implements HasMedia
                   ->from('values')
                   ->whereIn('id', $values->pluck('id')->toArray());
         });
+    }
+
+    /**
+     * Product meta fields trough category.
+     *
+     * @return HasManyThrough
+     */
+    public function metas(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Meta::class,
+            Category::class
+        );
+    }
+
+    /**
+     * Product meta fields.
+     *
+     * @return HasMany
+     */
+    public function productMetas(): HasMany
+    {
+        return $this->hasMany(ProductMeta::class);
     }
 
     // ================ //

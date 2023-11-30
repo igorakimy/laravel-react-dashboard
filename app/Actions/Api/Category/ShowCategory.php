@@ -17,6 +17,6 @@ final class ShowCategory extends Data
         return CategoryData::from($category->load([
             'parent',
             'children'
-        ]))->include('parent', 'children');
+        ]))->include('parent', 'children', 'metas');
     }
 }
