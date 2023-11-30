@@ -17,6 +17,7 @@ use App\Data\Product\ProductStoreData;
 use App\Data\Product\ProductUpdateData;
 use App\Data\Product\ProductUploadImagesData;
 use App\Http\Controllers\ApiController;
+use App\Models\Media;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
@@ -144,29 +145,34 @@ final class ProductController extends ApiController
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function uploadMedia(Request $request, Product $product): Response
+    public function uploadMedia(Request $request, Product $product, string $collection): Response
     {
-        $uploadedData = ProductUploadImagesData::fromRequest($request);
+        $uploadedData = ProductUploadImagesData::fromRequest($request, $collection);
 
-        $media = $this->uploadProductImageAction->handle($product, $uploadedData);
+        /** @var Media $media */
+        $media = $this->uploadProductImageAction->handle(
+            $product,
+            $uploadedData,
+            $collection,
+        );
 
-        $uuid = $media?->uuid;
+        $mediaID = $media?->id;
 
-        return response(['uuid' => $uuid], RespCode::HTTP_OK);
+        return response(['id' => $mediaID], RespCode::HTTP_OK);
     }
 
     /**
      * Delete uploaded image
      *
      * @param  Product  $product
-     * @param  string  $uuid
+     * @param  string  $id
      *
      * @return Response
      * @throws MediaCannotBeDeleted
      */
-    public function deleteMedia(Product $product, string $uuid): Response
+    public function deleteMedia(Product $product, string $id): Response
     {
-        $this->deleteProductImageAction->handle($product, $uuid);
+        $this->deleteProductImageAction->handle($product, $id);
 
         return response('', RespCode::HTTP_NO_CONTENT);
     }

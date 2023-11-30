@@ -103,7 +103,7 @@ const ProductsList = () => {
       ...getColumnSearchProps("categories"),
       render: (_, render) => (
         <Space size={[0, 4]} wrap>
-          {render.categories.map((category, i) => {
+          {render.categories.slice(0, 2).map((category, i) => {
             return (
               <span>
                 <Link to={`/categories/${category.id}`}>
@@ -112,6 +112,7 @@ const ProductsList = () => {
               </span>
             );
           })}
+          {render.categories.length > 2 ? "..." : ""}
         </Space>
       ),
     },

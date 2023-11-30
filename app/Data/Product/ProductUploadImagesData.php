@@ -2,6 +2,7 @@
 
 namespace App\Data\Product;
 
+use App\Enums\ProductMediaCollection;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Data;
@@ -9,18 +10,40 @@ use Spatie\LaravelData\Data;
 final class ProductUploadImagesData extends Data
 {
     public function __construct(
-        public UploadedFile|null $catalogImage,
-        public UploadedFile|null $productImage,
-        public UploadedFile|null $vectorImage,
+        public UploadedFile|null $image,
     ) {
     }
 
-    public static function fromRequest(Request $request): self
+    public static function fromRequest(Request $request, string $collection): self
     {
+        $request->validate(self::getValidationRulesForMediaCollection(
+            ProductMediaCollection::from($collection)
+        ));
+
         return new self(
-            catalogImage: $request->has('catalog_image') ? $request->file('catalog_image') : null,
-            productImage: $request->has('product_image') ? $request->file('product_image') : null,
-            vectorImage: $request->has('vector_image') ? $request->file('vector_image') : null
+            image: $request->file('image'),
         );
+    }
+
+    public static function getValidationRulesForMediaCollection(ProductMediaCollection $collection): array
+    {
+        return match ($collection) {
+            ProductMediaCollection::CATALOG_IMAGES, ProductMediaCollection::PRODUCT_IMAGES => [
+                'image' => [
+                    'required',
+                    'file',
+                    'max:5120',
+                    'mimes:jpeg,jpg,png,gif'
+                ],
+            ],
+            ProductMediaCollection::VECTOR_IMAGE => [
+                'image' => [
+                    'required',
+                    'file',
+                    'max:5120',
+                    'mimes:svg,svg+xml'
+                ]
+            ]
+        };
     }
 }

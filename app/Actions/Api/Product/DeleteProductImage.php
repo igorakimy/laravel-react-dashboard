@@ -12,10 +12,10 @@ final class DeleteProductImage extends ApiAction
     /**
      * @throws MediaCannotBeDeleted
      */
-    public function handle(Product $product, string $mediaUuid): Media|null
+    public function handle(Product $product, string $mediaID): Media|null
     {
         /** @var Media $media */
-        $media = Media::query()->where('uuid', $mediaUuid)->first();
+        $media = Media::query()->find($mediaID);
 
         if ($media) {
             $product->deleteMedia($media);

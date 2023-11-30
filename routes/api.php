@@ -98,7 +98,7 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Products routes.
      */
     Route::apiResource('/products', ProductController::class);
-    Route::post('/products/{product}/upload-media', [ProductController::class, 'uploadMedia'])
+    Route::post('/products/{product}/upload-media/{collection}', [ProductController::class, 'uploadMedia'])
          ->name('products.upload_media');
     Route::delete('/products/{product}/delete-media/{media}', [ProductController::class, 'deleteMedia'])
          ->name('products.delete_media');
@@ -124,6 +124,13 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
          ->name('settings.zoho_books.index');
     Route::put('/settings/zoho-books', [ZohoBooksSettingsController::class, 'update'])
          ->name('settings.zoho_books.update');
+
+    /**
+     * Media routes.
+     */
+    Route::put('/medias/bulk-update', [MediaController::class, 'bulkUpdate'])->name('medias.bulk-update');
+    Route::delete('/medias/bulk-delete', [MediaController::class, 'bulkDelete'])->name('medias.bulk-delete');
+    Route::apiResource('/medias', MediaController::class)->only('show', 'update');
 });
 
 /**
