@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  Dropdown,
   Input,
   message,
   Popconfirm,
@@ -8,27 +9,34 @@ import {
   Table,
   Tag,
   Tooltip,
+  Upload,
 } from "antd";
 import { useStateContext } from "../../contexts/ContextProvider.jsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, cloneElement } from "react";
 import Highlighter from "react-highlight-words";
 import {
   DeleteFilled,
+  DotChartOutlined,
   EditFilled,
+  EllipsisOutlined,
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCreateForm from "../../components/forms/ProductCreateForm.jsx";
 import ProductUpdateForm from "../../components/forms/ProductUpdateForm.jsx";
+import ExportProductModal from "../../components/modals/ExportProductModal.jsx";
 
 const ProductsList = () => {
   const { can } = useStateContext();
   const navigate = useNavigate();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
+  const [openExportForm, setOpenExportForm] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -405,6 +413,57 @@ const ProductsList = () => {
     });
   };
 
+  const handleAdditionalMenu = (e) => {
+    const menuKey = e.key;
+
+    switch (menuKey) {
+      case "1":
+        return showExportModal();
+      default:
+        return;
+    }
+  };
+
+  const showExportModal = () => {
+    setOpenExportForm(true);
+  };
+
+  const handleExport = (values) => {
+    setExportLoading(true);
+    messageApi.open({
+      type: "loading",
+      content: "Exporting..",
+      duration: 0,
+    });
+
+    axiosClient
+      .post("/products/export", values, { responseType: "blob" })
+      .then(({ data }) => {
+        messageApi.destroy();
+        messageApi.success("Export successfully done!");
+        setOpenExportForm(false);
+        setExportLoading(false);
+
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement("a");
+        link.href = url;
+        const date = new Date();
+        link.setAttribute(
+          "download",
+          `${date.toLocaleDateString()}-${date.toLocaleTimeString()}-products.${
+            values.export_as
+          }`,
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => {
+        messageApi.destroy();
+        console.log(err);
+      });
+  };
+
   return (
     <Card
       type="inner"
@@ -433,6 +492,25 @@ const ProductsList = () => {
               Create
             </Button>
           ) : null}
+
+          <Dropdown.Button
+            size="large"
+            trigger="click"
+            menu={{
+              items: [
+                {
+                  label: "Export",
+                  key: "1",
+                  icon: <UploadOutlined />,
+                },
+              ],
+              onClick: handleAdditionalMenu,
+            }}
+            buttonsRender={([leftButton, rightButton]) => [
+              null,
+              <Button size="small" icon={<EllipsisOutlined />}></Button>,
+            ]}
+          ></Dropdown.Button>
         </Space>
       }
     >
@@ -467,6 +545,14 @@ const ProductsList = () => {
         onCancel={() => setOpenCreateForm(false)}
         errors={errors}
         onError={handleErrors}
+      />
+
+      <ExportProductModal
+        open={openExportForm}
+        loading={exportLoading}
+        onExport={handleExport}
+        onCancel={() => setOpenExportForm(false)}
+        errors={errors}
       />
     </Card>
   );

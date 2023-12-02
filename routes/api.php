@@ -99,6 +99,8 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     /*
      * Products routes.
      */
+    Route::post('/products/export', [ProductController::class, 'export'])
+         ->name('products.export');
     Route::apiResource('/products', ProductController::class);
     Route::post('/products/{product}/upload-media/{collection}', [ProductController::class, 'uploadMedia'])
          ->name('products.upload_media');

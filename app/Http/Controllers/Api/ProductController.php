@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Api\Product\DeleteProduct;
+use App\Actions\Api\Product\ExportProducts;
 use App\Actions\Api\Product\FetchPaginatedProducts;
 use App\Actions\Api\Product\DeleteProductImage;
 use App\Actions\Api\Product\FetchProductsForSelect;
@@ -10,6 +11,7 @@ use App\Actions\Api\Product\ShowProduct;
 use App\Actions\Api\Product\StoreProduct;
 use App\Actions\Api\Product\UpdateProduct;
 use App\Actions\Api\Product\UploadProductImage;
+use App\Data\Product\ProductExportData;
 use App\Data\Product\ProductFilteringData;
 use App\Data\Product\ProductPaginationData;
 use App\Data\Product\ProductSortingData;
@@ -25,6 +27,7 @@ use Illuminate\Http\Response;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\MediaCannotBeDeleted;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response as RespCode;
 
 final class ProductController extends ApiController
@@ -38,6 +41,7 @@ final class ProductController extends ApiController
         private readonly DeleteProduct $deleteProductAction,
         private readonly UploadProductImage $uploadProductImageAction,
         private readonly DeleteProductImage $deleteProductImageAction,
+        private readonly ExportProducts $exportProductsAction,
     ) {
     }
 
@@ -140,6 +144,7 @@ final class ProductController extends ApiController
      *
      * @param  Request  $request
      * @param  Product  $product
+     * @param  string  $collection
      *
      * @return Response
      * @throws FileDoesNotExist
@@ -175,5 +180,24 @@ final class ProductController extends ApiController
         $this->deleteProductImageAction->handle($product, $id);
 
         return response('', RespCode::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Export products to csv/xlsx formats.
+     *
+     * @param  Request  $request
+     *
+     * @return BinaryFileResponse
+     */
+    public function export(Request $request): BinaryFileResponse
+    {
+        $data = ProductExportData::fromRequest($request);
+
+        $res = $this->exportProductsAction->handle($data);
+
+        return response()->download(
+            file: $res->file,
+            headers: $res->headers
+        );
     }
 }
