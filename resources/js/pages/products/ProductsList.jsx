@@ -414,7 +414,7 @@ const ProductsList = () => {
           <Button
             size="small"
             type="primary"
-            style={{ backgroundColor: "#faad14" }}
+            style={{ backgroundColor: "green" }}
             onClick={clearAll}
             icon={<SyncOutlined />}
           >

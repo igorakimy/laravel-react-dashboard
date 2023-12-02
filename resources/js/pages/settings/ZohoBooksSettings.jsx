@@ -262,6 +262,7 @@ const ZohoBooksSettings = () => {
             {refreshToken && Date.now() / 1000 < expireToken ? (
               <Button
                 onClick={handleDisconnectZohoBooks}
+                size="small"
                 type="primary"
                 style={{
                   backgroundColor: "#ff4d4f",
@@ -270,12 +271,17 @@ const ZohoBooksSettings = () => {
                 Disconnect
               </Button>
             ) : (
-              <Button onClick={handleConnectZohoBooks} type="primary">
+              <Button
+                size="small"
+                onClick={handleConnectZohoBooks}
+                type="primary"
+              >
                 Connect
               </Button>
             )}
             <Button
               type="primary"
+              size="small"
               onClick={handleSaveZohoBooksConfig}
               style={{ backgroundColor: "green" }}
             >
@@ -314,6 +320,7 @@ const ZohoBooksSettings = () => {
         extra={
           <Space>
             <Button
+              size="small"
               type="primary"
               onClick={handleFieldsMapping}
               style={{ backgroundColor: "green" }}

@@ -12,6 +12,7 @@ import Settings from "./pages/settings/Settings.jsx";
 import Error403 from "./pages/errors/Error403.jsx";
 import InvitationsList from "./pages/invitations/InvitationsList.jsx";
 import Register from "./pages/auth/Register.jsx";
+import ActivityList from "./pages/activity/ActivityList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/categories",
         element: <CategoriesList />,
+      },
+      {
+        path: "/activity",
+        element: <ActivityList />,
       },
       {
         path: "/settings",

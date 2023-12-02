@@ -6,6 +6,7 @@ import {
   ShoppingOutlined,
   DashboardOutlined,
   SettingOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 
@@ -35,10 +36,11 @@ const SidebarMenu = () => {
       getItem("Products", "products.index", "7", "/products"),
       getItem("Categories", "categories.index", "8", "/categories"),
     ]),
+    getItem("Activity", null, "9", "/activity", <HistoryOutlined />),
     getItem(
       "Settings",
       "settings.index",
-      "9",
+      "10",
       "/settings",
       <SettingOutlined />,
     ),
