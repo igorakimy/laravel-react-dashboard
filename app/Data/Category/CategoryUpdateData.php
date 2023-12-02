@@ -13,7 +13,8 @@ final class CategoryUpdateData extends Data
     public function __construct(
         public string $name,
         public int|null $parent_id,
-        public string|null $description
+        public string|null $description,
+        public string|null $image
     ) {
     }
 
@@ -28,6 +29,7 @@ final class CategoryUpdateData extends Data
             name: $request->input('name'),
             parent_id: $request->input('parent'),
             description: $request->input('description'),
+            image: $request->input('image'),
         );
     }
 
@@ -48,6 +50,7 @@ final class CategoryUpdateData extends Data
             ],
             'parent' => ['nullable', 'integer'],
             'description' => ['nullable', 'string'],
+            'image' => ['nullable', 'string'],
         ];
     }
 }

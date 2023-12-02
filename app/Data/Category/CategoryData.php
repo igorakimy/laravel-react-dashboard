@@ -2,6 +2,7 @@
 
 namespace App\Data\Category;
 
+use App\Data\Media\MediaData;
 use App\Data\Meta\MetaData;
 use App\Models\Category;
 use Carbon\Carbon;
@@ -19,6 +20,8 @@ final class CategoryData extends Data
         public string $name,
         public string $slug,
         public string|null $description,
+
+        public MediaData|Lazy|null $image,
 
         public CategoryData|Lazy|null $parent,
 
@@ -43,6 +46,7 @@ final class CategoryData extends Data
             name: $category->name,
             slug: $category->slug,
             description: $category->description,
+            image: Lazy::create(fn() => MediaData::collection($category->getMedia('image'))->first()),
             parent: Lazy::whenLoaded(
                 'parent',
                 $category,

@@ -45,6 +45,8 @@ const ProductUpdateForm = ({
   const [form] = Form.useForm();
   const [imageUpdateForm] = Form.useForm();
   const [bulkEditForm] = Form.useForm();
+  const [localFields, setLocalFields] = useState([]);
+  const [integrations, setIntegrations] = useState([]);
   const [clientReady, setClientReady] = useState(true);
   const [categories, setCategories] = useState([]);
   const [colors, setColors] = useState([]);
@@ -74,11 +76,13 @@ const ProductUpdateForm = ({
   const { confirm } = Modal;
 
   useEffect(() => {
+    getLocalFields();
     getCategories();
     getColors();
     getMaterials();
     getVendors();
     getTypes();
+    getIntegrations();
 
     setErrors({});
     setBulkActionsVisible(false);
@@ -250,6 +254,28 @@ const ProductUpdateForm = ({
       .catch((err) => {
         console.log(err);
         return false;
+      });
+  };
+
+  const getLocalFields = () => {
+    axiosClient
+      .get("/local-fields")
+      .then(({ data }) => {
+        setLocalFields(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getIntegrations = () => {
+    axiosClient
+      .get("/integrations")
+      .then(({ data }) => {
+        setIntegrations(data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -522,6 +548,84 @@ const ProductUpdateForm = ({
     });
   };
 
+  const getFieldValidationRules = (field) => {
+    let rules = [];
+
+    if (field.validations?.required) {
+      rules.push({
+        required: true,
+        message: `${field.name} field is required`,
+      });
+    }
+
+    return rules;
+  };
+
+  const getOptionsForResource = (resourceName) => {
+    switch (resourceName) {
+      case "categories":
+        return categories;
+      case "color_id":
+        return colors;
+      case "material_id":
+        return materials;
+      case "vendor_id":
+        return vendors;
+      case "type_id":
+        return types;
+      default:
+        return [];
+    }
+  };
+
+  const buildFormItems = (field) => {
+    return (
+      <Form.Item
+        name={field.slug}
+        label={field.name}
+        rules={getFieldValidationRules(field)}
+        validateStatus={errors[field.slug] ? "error" : null}
+        help={errors[field.slug] ? errors[field.slug][0] : null}
+      >
+        {field.field_type === "text" && <Input onChange={handleInputChange} />}
+
+        {field.field_type === "number" && (
+          <InputNumber
+            addonAfter={field.properties.addon ?? null}
+            style={{
+              width: "100%",
+            }}
+            min={field.validations.min}
+            max={field.validations.max}
+            defaultValue={field.default_value ?? 0}
+            onChange={handleChange(field.slug)}
+          />
+        )}
+
+        {field.field_type === "select" && (
+          <Select
+            allowClear={!field.validations?.required}
+            showSearch
+            options={getOptionsForResource(field.slug)}
+          />
+        )}
+
+        {field.field_type === "multiselect" && (
+          <Select
+            showSearch
+            allowClear
+            mode="multiple"
+            options={getOptionsForResource(field.slug)}
+          />
+        )}
+
+        {field.field_type === "textarea" && (
+          <TextArea onChange={handleInputChange} />
+        )}
+      </Form.Item>
+    );
+  };
+
   // const sendUpdateImageForm = () => {
   //   imageUpdateForm
   //     .validateFields()
@@ -553,9 +657,7 @@ const ProductUpdateForm = ({
       width={1215}
     >
       {contextHolder}
-      <Title level={4}>
-        Edit Product <h2 style={{ display: "inline" }}>"{product.name}"</h2>
-      </Title>
+      <Title level={4}>Edit Product</Title>
       <Divider style={{ margin: "0.6rem 0" }}></Divider>
       <Tabs
         defaultActiveKey="1"
@@ -569,7 +671,7 @@ const ProductUpdateForm = ({
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
                 form={form}
-                initialValues={product}
+                initialValues={{ ...product }}
                 labelAlign="left"
                 onValuesChange={onValuesChange}
                 onFieldsChange={() =>
@@ -583,299 +685,18 @@ const ProductUpdateForm = ({
               >
                 <Row gutter={48}>
                   <Col key="1" span={12}>
-                    <Form.Item
-                      name="name"
-                      label="Name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the name of product",
-                        },
-                      ]}
-                      validateStatus={errors.name ? "error" : null}
-                      help={errors.name ? errors.name[0] : null}
-                    >
-                      <Input onChange={handleInputChange} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="sku"
-                      label="SKU"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the SKU of product",
-                        },
-                      ]}
-                      validateStatus={errors.sku ? "error" : null}
-                      help={errors.sku ? errors.sku[0] : null}
-                    >
-                      <Input onChange={handleInputChange} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="quantity"
-                      label="Quantity"
-                      rules={[
-                        {
-                          required: true,
-                          message:
-                            "Please input the quantity in stock of product",
-                        },
-                      ]}
-                      validateStatus={errors.quantity ? "error" : null}
-                      help={errors.quantity ? errors.quantity[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        defaultValue={1}
-                        onChange={handleChange("quantity")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="cost_price"
-                      label="Cost Price"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the cost price of product",
-                        },
-                      ]}
-                      validateStatus={errors.cost_price ? "error" : null}
-                      help={errors.cost_price ? errors.cost_price[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        addonAfter="$"
-                        onChange={handleChange("cost_price")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="selling_price"
-                      label="Selling Price"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the selling price of product",
-                        },
-                      ]}
-                      validateStatus={errors.selling_price ? "error" : null}
-                      help={
-                        errors.selling_price ? errors.selling_price[0] : null
-                      }
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        addonAfter="$"
-                        onChange={handleChange("selling_price")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="margin"
-                      label="Margin"
-                      rules={[]}
-                      validateStatus={errors.margin ? "error" : null}
-                      help={errors.margin ? errors.margin[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        step={0.1}
-                        defaultValue={0.0}
-                        addonAfter="%"
-                        onChange={handleChange("margin")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="width"
-                      label="Width"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the width of product",
-                        },
-                      ]}
-                      validateStatus={errors.width ? "error" : null}
-                      help={errors.width ? errors.width[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        defaultValue={0}
-                        onChange={handleChange("width")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="height"
-                      label="Height"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the height of product",
-                        },
-                      ]}
-                      validateStatus={errors.height ? "error" : null}
-                      help={errors.height ? errors.height[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        defaultValue={0}
-                        onChange={handleChange("height")}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="weight"
-                      label="Weight"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input the weight of product",
-                        },
-                      ]}
-                      validateStatus={errors.weight ? "error" : null}
-                      help={errors.weight ? errors.weight[0] : null}
-                    >
-                      <InputNumber
-                        style={{
-                          width: "100%",
-                        }}
-                        min={0}
-                        max={9999}
-                        defaultValue={0}
-                        onChange={handleChange("weight")}
-                      />
-                    </Form.Item>
+                    {localFields
+                      .slice(0, Math.floor(localFields.length / 2))
+                      .map((field) => {
+                        return buildFormItems(field);
+                      })}
                   </Col>
-
                   <Col key="2" span={12}>
-                    <Form.Item
-                      name="barcode"
-                      label="Barcode/UPC"
-                      rules={[]}
-                      validateStatus={errors.barcode ? "error" : null}
-                      help={errors.barcode ? errors.barcode[0] : null}
-                    >
-                      <Input onChange={handleInputChange} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="location"
-                      label="Location/Bin Number"
-                      rules={[]}
-                      validateStatus={errors.location ? "error" : null}
-                      help={errors.location ? errors.location[0] : null}
-                    >
-                      <Input onChange={handleInputChange} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="color_id"
-                      label="Color"
-                      rules={[]}
-                      validateStatus={errors.color_id ? "error" : null}
-                      help={errors.color_id ? errors.color_id[0] : null}
-                    >
-                      <Select showSearch options={colors} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="material_id"
-                      label="Material"
-                      rules={[]}
-                      validateStatus={errors.material_id ? "error" : null}
-                      help={errors.material_id ? errors.material_id[0] : null}
-                    >
-                      <Select showSearch options={materials} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="vendor_id"
-                      label="Vendor"
-                      rules={[]}
-                      validateStatus={errors.vendor_id ? "error" : null}
-                      help={errors.vendor_id ? errors.vendor_id[0] : null}
-                    >
-                      <Select showSearch options={vendors} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="type_id"
-                      label="Type"
-                      rules={[]}
-                      validateStatus={errors.type_id ? "error" : null}
-                      help={errors.type_id ? errors.type_id[0] : null}
-                    >
-                      <Select showSearch options={types} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="categories"
-                      label="Categories"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select categories",
-                          type: "array",
-                        },
-                      ]}
-                      validateStatus={errors.categories ? "error" : null}
-                      help={errors.categories ? errors.categories[0] : null}
-                    >
-                      <Select
-                        showSearch
-                        allowClear
-                        mode="multiple"
-                        options={categories}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="caption"
-                      label="Caption"
-                      rules={[]}
-                      validateStatus={errors.caption ? "error" : null}
-                      help={errors.caption ? errors.caption[0] : null}
-                    >
-                      <TextArea onChange={handleInputChange} />
-                    </Form.Item>
-
-                    <Form.Item
-                      name="description"
-                      label="Description"
-                      rules={[]}
-                      validateStatus={errors.description ? "error" : null}
-                      help={errors.description ? errors.description[0] : null}
-                    >
-                      <TextArea onChange={handleInputChange} />
-                    </Form.Item>
+                    {localFields
+                      .slice(Math.floor(localFields.length / 2))
+                      .map((field) => {
+                        return buildFormItems(field);
+                      })}
                   </Col>
                 </Row>
               </Form>

@@ -195,6 +195,18 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * Local fields.
+     *
+     * @return BelongsToMany
+     */
+    public function localFields(): BelongsToMany
+    {
+        return $this->belongsToMany(LocalField::class, 'product_local_fields')
+                    ->using(ProductLocalField::class)
+                    ->withPivot('value', 'custom_props');
+    }
+
+    /**
      * Product meta fields trough category.
      *
      * @return HasManyThrough
@@ -215,6 +227,19 @@ class Product extends Model implements HasMedia
     public function productMetas(): HasMany
     {
         return $this->hasMany(ProductMeta::class);
+    }
+
+    /**
+     * Product integrations.
+     *
+     * @return BelongsToMany
+     */
+    public function integrations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Integration::class,
+            'product_integrations'
+        );
     }
 
     // ================ //

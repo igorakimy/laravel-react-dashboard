@@ -11,32 +11,16 @@ final class StoreProduct extends ApiAction
 {
     public function handle(ProductStoreData $data): ProductData
     {
+        // create new product.
         $product = new Product();
 
-        $product->name = $data->name;
-        $product->sku = $data->sku;
-        $product->quantity = $data->quantity;
-        $product->cost_price = $data->cost_price;
-        $product->selling_price = $data->selling_price;
-        $product->margin = $data->margin;
-        $product->width = $data->width;
-        $product->height = $data->height;
-        $product->weight = $data->weight;
-        $product->barcode = $data->barcode;
-        $product->location = $data->location;
-        $product->color_id = $data->color->id;
-        $product->material_id = $data->material->id;
-        $product->vendor_id = $data->vendor->id;
-        $product->type_id = $data->type->id;
-        $product->caption = $data->caption;
-        $product->description = $data->description;
+        $product->fill($data->except('metas', 'categories')->toArray());
+
+        // attach categories to new product.
+        $product->categories()->attach($data->categories->toCollection()->pluck('id'));
 
         $product->save();
 
-        $product->categories()->attach($data->categories->toCollection()->pluck('id'));
-
-        $product->load('categories');
-
-        return ProductData::from($product);
+        return ProductData::from($product)->include('categories');
     }
 }

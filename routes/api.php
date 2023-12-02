@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\IntegrationController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\LocalFieldController;
 use App\Http\Controllers\Api\MaterialController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Api\MetaController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\TemporaryFileController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
@@ -131,10 +133,15 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     Route::put('/medias/bulk-update', [MediaController::class, 'bulkUpdate'])->name('medias.bulk-update');
     Route::delete('/medias/bulk-delete', [MediaController::class, 'bulkDelete'])->name('medias.bulk-delete');
     Route::apiResource('/medias', MediaController::class)->only('show', 'update');
+
+    /**
+     * Integrations routes.
+     */
+    Route::apiResource('/integrations', IntegrationController::class)->only('index');
 });
 
 /**
- * Integrations routes.
+ * Specific integrations routes.
  */
 Route::middleware(['auth:sanctum'])->prefix('integrations')->group(function () {
     /**
@@ -146,6 +153,14 @@ Route::middleware(['auth:sanctum'])->prefix('integrations')->group(function () {
         Route::get('/callback', [ZohoBooksController::class, 'handleAuthCallback'])
              ->name('integrations.zoho_books.callback');
     });
+});
+
+/*
+ * Temporary files.
+ */
+Route::middleware(['auth:sanctum'])->prefix('temporary')->group(function () {
+   Route::post('/upload', [TemporaryFileController::class, 'upload'])
+        ->name('temporary.upload');
 });
 
 /*

@@ -4,6 +4,7 @@ namespace App\Data\Product;
 
 use App\Data\Category\CategoryData;
 use App\Data\Color\ColorData;
+use App\Data\Integration\IntegrationData;
 use App\Data\Material\MaterialData;
 use App\Data\Media\MediaData;
 use App\Data\Type\TypeData;
@@ -47,6 +48,9 @@ final class ProductData extends Data
         #[DataCollectionOf(ProductMetaData::class)]
         public DataCollection|Lazy|null $metas,
 
+        #[DataCollectionOf(IntegrationData::class)]
+        public DataCollection|Lazy|null $integrations,
+
         public string|null $caption,
         public string|null $description,
 
@@ -76,6 +80,7 @@ final class ProductData extends Data
             type: Lazy::create(fn() => TypeData::optional($product->type)),
             categories: Lazy::create(fn() => CategoryData::collection($product->categories)),
             metas: Lazy::create(fn() => ProductMetaData::collection($product->productMetas)),
+            integrations: Lazy::create(fn() => IntegrationData::collection($product->integrations)),
             caption: $product->caption,
             description: $product->description,
             media: Lazy::create(fn() => MediaData::collection($product->media)),

@@ -27,6 +27,7 @@ final class FetchProductsForSelect extends ApiAction
         // apply sorting
         $query = $this->applySorting($query, $sorting);
 
+        // get products
         $products = $query->get();
 
         return ProductForSelectData::collection($products);
@@ -62,12 +63,12 @@ final class FetchProductsForSelect extends ApiAction
     /**
      * Apply sorting to products.
      *
-     * @param  Builder  $query
+     * @param  Builder|Product  $query
      * @param  SortingData  $sorting
      *
      * @return Builder
      */
-    private function applySorting(Builder $query, SortingData $sorting): Builder
+    private function applySorting(Builder|Product $query, SortingData $sorting): Builder
     {
         if ($sorting->column === 'categories') {
             $query = $query->orderByCategories($sorting->direction);

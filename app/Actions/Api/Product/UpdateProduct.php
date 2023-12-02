@@ -19,10 +19,7 @@ final class UpdateProduct extends ApiAction
         ProductUpdateData $data,
     ): ProductData {
 
-        $product->fill($data->except(
-            'metas',
-            'categories',
-        )->toArray());
+        $product->fill($data->except('metas', 'categories', 'integrations')->toArray());
 
         if($product->save()) {
             $categoriesIds = $data->categories->toCollection()->pluck('id')->toArray();

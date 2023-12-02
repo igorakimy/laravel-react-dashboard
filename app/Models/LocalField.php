@@ -20,6 +20,22 @@ class LocalField extends Model
         'properties' => 'array',
     ];
 
+    // =================== //
+    //      RELATIONS      //
+    // =================== //
+
+    /**
+     * Products.
+     *
+     * @return BelongsToMany
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_local_fields')
+                    ->using(ProductLocalField::class)
+                    ->withPivot('value', 'custom_column');
+    }
+
     /**
      * Integration fields.
      *

@@ -3,6 +3,7 @@
 namespace App\Data\Product;
 
 use App\Data\Category\CategoryData;
+use App\Data\Integration\IntegrationData;
 use App\Models\Category;
 use Exception;
 use Illuminate\Http\Request;
@@ -44,6 +45,9 @@ class ProductUpdateData extends Data
         #[DataCollectionOf(ProductMetaData::class)]
         public DataCollection|null $metas,
 
+        #[DataCollectionOf(IntegrationData::class)]
+        public DataCollection|null $integrations,
+
         public string|null $caption,
         public string|null $description,
     ) {
@@ -81,6 +85,7 @@ class ProductUpdateData extends Data
                     return new ProductMetaData(Optional::create(), $meta['meta_id'], $meta['value']);
                 })->toArray())
                 : null,
+            integrations: $request->input('integrations'),
             caption: $request->input('caption'),
             description: $request->input('description'),
         );

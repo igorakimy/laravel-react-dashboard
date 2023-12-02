@@ -14,9 +14,11 @@ final class ShowCategory extends Data
             $category = Category::query()->findOrFail($category);
         }
 
-        return CategoryData::from($category->load([
+        return CategoryData::from($category->load(['parent', 'children']))->include(
+            'image',
             'parent',
-            'children'
-        ]))->include('parent', 'children', 'metas');
+            'children',
+            'metas',
+        );
     }
 }

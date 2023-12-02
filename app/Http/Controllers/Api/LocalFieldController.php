@@ -15,7 +15,7 @@ final class LocalFieldController extends ApiController
      */
     public function index(): Response
     {
-        $localFields = LocalField::query()->get();
+        $localFields = LocalField::query()->orderBy('order')->get();
 
         return response($localFields);
     }

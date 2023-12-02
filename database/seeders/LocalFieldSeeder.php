@@ -68,7 +68,7 @@ class LocalFieldSeeder extends Seeder
                 ],
                 'properties'  => [
                     'placeholder' => 'Cost Price',
-                    'addon'       => 'money-bill',
+                    'addon'       => '$',
                 ]
             ],
             [
@@ -83,7 +83,7 @@ class LocalFieldSeeder extends Seeder
                 ],
                 'properties'  => [
                     'placeholder' => 'Selling Price',
-                    'addon'       => 'money-bill',
+                    'addon'       => '$',
                 ]
             ],
             [
@@ -98,7 +98,7 @@ class LocalFieldSeeder extends Seeder
                 ],
                 'properties'  => [
                     'placeholder' => 'Margin',
-                    'addon'       => 'percent',
+                    'addon'       => '%',
                 ]
             ],
             [
