@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\IntegrationController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\LocalFieldController;
@@ -101,6 +102,10 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      */
     Route::post('/products/export', [ProductController::class, 'export'])
          ->name('products.export');
+    Route::post('/products/import', [ProductController::class, 'import'])
+         ->name('products.import');
+    Route::delete('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])
+         ->name('products.bulk-delete');
     Route::apiResource('/products', ProductController::class);
     Route::post('/products/{product}/upload-media/{collection}', [ProductController::class, 'uploadMedia'])
          ->name('products.upload_media');
@@ -140,6 +145,12 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
      * Integrations routes.
      */
     Route::apiResource('/integrations', IntegrationController::class)->only('index');
+
+    /**
+     * Import routes.
+     */
+    Route::get('/imports/headers', [ImportController::class, 'headers'])
+         ->name('imports.headers');
 });
 
 /**

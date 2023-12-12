@@ -9,14 +9,13 @@ import {
   Table,
   Tag,
   Tooltip,
-  Upload,
 } from "antd";
-import { useStateContext } from "../../contexts/ContextProvider.jsx";
-import { useEffect, useRef, useState, cloneElement } from "react";
+import {useStateContext} from "../../contexts/ContextProvider.jsx";
+import {useEffect, useRef, useState} from "react";
 import Highlighter from "react-highlight-words";
 import {
-  DeleteFilled,
-  DotChartOutlined,
+  DeleteFilled, DeleteOutlined,
+  DownloadOutlined, DownOutlined,
   EditFilled,
   EllipsisOutlined,
   PlusOutlined,
@@ -25,18 +24,22 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
-import { Link, useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import ProductCreateForm from "../../components/forms/ProductCreateForm.jsx";
 import ProductUpdateForm from "../../components/forms/ProductUpdateForm.jsx";
 import ExportProductModal from "../../components/modals/ExportProductModal.jsx";
+import ImportProductModal from "../../components/modals/ImportProductModal.jsx";
 
 const ProductsList = () => {
-  const { can } = useStateContext();
+  const {can} = useStateContext();
   const navigate = useNavigate();
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [openExportForm, setOpenExportForm] = useState(false);
+  const [openImportForm, setOpenImportForm] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -161,7 +164,7 @@ const ProductsList = () => {
                 size="small"
                 loading={editLoadings[render.id] || false}
                 onClick={() => showUpdateProductForm(render.id)}
-                icon={<EditFilled style={{ color: "#456cec" }} />}
+                icon={<EditFilled style={{color: "#456cec"}}/>}
               />
             </Tooltip>
           )}
@@ -176,7 +179,7 @@ const ProductsList = () => {
               <Tooltip placement="top" title="Delete">
                 <Button
                   size="small"
-                  icon={<DeleteFilled style={{ color: "#ec4545" }} />}
+                  icon={<DeleteFilled style={{color: "#ec4545"}}/>}
                 />
               </Tooltip>
             </Popconfirm>
@@ -192,7 +195,7 @@ const ProductsList = () => {
       .get("/products", {
         params: getTableParams(tableParams),
       })
-      .then(({ data }) => {
+      .then(({data}) => {
         setProducts(data.data);
         setLoading(false);
         setTableParams({
@@ -233,12 +236,12 @@ const ProductsList = () => {
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
+                       setSelectedKeys,
+                       selectedKeys,
+                       confirm,
+                       clearFilters,
+                       close,
+                     }) => (
       <div
         style={{
           padding: 8,
@@ -323,12 +326,12 @@ const ProductsList = () => {
 
     axiosClient
       .post("/products", values)
-      .then(({ data }) => {
+      .then(({data}) => {
         setOpenCreateForm(false);
         getProducts();
         showMessage("success", "Product successfully created!");
       })
-      .catch(({ response }) => {
+      .catch(({response}) => {
         const err = response?.data?.errors;
         if (err) {
           setErrors(err);
@@ -345,12 +348,12 @@ const ProductsList = () => {
 
     axiosClient
       .get("/products/" + productId)
-      .then(({ data }) => {
+      .then(({data}) => {
         setProduct(data);
         setOpenUpdateForm(true);
         enterEditLoading(productId, false);
       })
-      .catch(({ response }) => {
+      .catch(({response}) => {
         showMessage("error", response?.data?.message);
       });
   };
@@ -361,12 +364,12 @@ const ProductsList = () => {
 
     axiosClient
       .put("/products/" + productId, values)
-      .then(({ data }) => {
+      .then(({data}) => {
         setOpenUpdateForm(false);
         getProducts();
         showMessage("success", "Product successfully updated!");
       })
-      .catch(({ response }) => {
+      .catch(({response}) => {
         const err = response?.data?.errors;
         if (err) {
           setErrors(err);
@@ -384,11 +387,11 @@ const ProductsList = () => {
 
     axiosClient
       .delete("/products/" + productId)
-      .then(({ data }) => {
+      .then(({data}) => {
         getProducts();
         showMessage("success", "Product successfully deleted!");
       })
-      .catch(({ response }) => {
+      .catch(({response}) => {
         showMessage("error", "Failed to delete product");
       });
   };
@@ -419,6 +422,8 @@ const ProductsList = () => {
     switch (menuKey) {
       case "1":
         return showExportModal();
+      case "2":
+        return showImportModal();
       default:
         return;
     }
@@ -432,13 +437,13 @@ const ProductsList = () => {
     setExportLoading(true);
     messageApi.open({
       type: "loading",
-      content: "Exporting..",
+      content: "Exporting, please wait...",
       duration: 0,
     });
 
     axiosClient
-      .post("/products/export", values, { responseType: "blob" })
-      .then(({ data }) => {
+      .post("/products/export", values, {responseType: "blob"})
+      .then(({data}) => {
         messageApi.destroy();
         messageApi.success("Export successfully done!");
         setOpenExportForm(false);
@@ -460,9 +465,47 @@ const ProductsList = () => {
       })
       .catch((err) => {
         messageApi.destroy();
+        setExportLoading(false);
         console.log(err);
       });
   };
+
+  const showImportModal = () => {
+    setOpenImportForm(true);
+  };
+
+  const handleImport = (values) => {
+  };
+
+  const handleBulkDelete = () => {
+    axiosClient
+      .delete('/products/bulk-delete?ids=' + selectedRowKeys.join(','))
+      .then(({data}) => {
+        messageApi.success(data.message);
+        setSelectedRowKeys([]);
+        getProducts();
+      })
+      .catch((err) => {
+        messageApi.error(err.message);
+      })
+  }
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    type: "checkbox",
+  };
+  const hasSelected = selectedRowKeys.length > 0;
+
+  const handleBulkActionsItemClick = (e) => {
+    if (e.key === '2') {
+      handleBulkDelete();
+    }
+  }
 
   return (
     <Card
@@ -470,12 +513,34 @@ const ProductsList = () => {
       title="Products"
       extra={
         <Space>
+          <Dropdown
+            trigger="click"
+            menu={{
+              items: [{
+                label: "Delete",
+                key: "2",
+                icon: <DeleteOutlined/>,
+                danger: true,
+              }],
+              onClick: handleBulkActionsItemClick
+            }}
+          >
+            <Button style={{
+              display: hasSelected ? "inline-block" : "none",
+            }} size="small">
+              <Space>
+                Bulk Actions
+                <DownOutlined/>
+              </Space>
+            </Button>
+          </Dropdown>
+
           <Button
             size="small"
             type="primary"
-            style={{ backgroundColor: "green" }}
+            style={{backgroundColor: "green"}}
             onClick={clearAll}
-            icon={<SyncOutlined />}
+            icon={<SyncOutlined/>}
           >
             Reload
           </Button>
@@ -488,7 +553,7 @@ const ProductsList = () => {
                 setOpenCreateForm(true);
               }}
             >
-              <PlusOutlined />
+              <PlusOutlined/>
               Create
             </Button>
           ) : null}
@@ -501,14 +566,19 @@ const ProductsList = () => {
                 {
                   label: "Export",
                   key: "1",
-                  icon: <UploadOutlined />,
+                  icon: <UploadOutlined/>,
+                },
+                {
+                  label: "Import",
+                  key: "2",
+                  icon: <DownloadOutlined/>,
                 },
               ],
               onClick: handleAdditionalMenu,
             }}
             buttonsRender={([leftButton, rightButton]) => [
               null,
-              <Button size="small" icon={<EllipsisOutlined />}></Button>,
+              <Button size="small" icon={<EllipsisOutlined/>}></Button>,
             ]}
           ></Dropdown.Button>
         </Space>
@@ -517,16 +587,14 @@ const ProductsList = () => {
       {contextHolder}
 
       <Table
-        rowSelection={{
-          type: "checkbox",
-        }}
+        rowSelection={rowSelection}
         columns={getColumns()}
         rowKey={(record) => record.id}
         dataSource={products}
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
-        scroll={{ y: 600, x: 500 }}
+        scroll={{y: 600, x: 500}}
         size="small"
       />
 
@@ -552,6 +620,15 @@ const ProductsList = () => {
         loading={exportLoading}
         onExport={handleExport}
         onCancel={() => setOpenExportForm(false)}
+        errors={errors}
+      />
+
+      <ImportProductModal
+        open={openImportForm}
+        updateProducts={getProducts}
+        loading={importLoading}
+        onImport={handleImport}
+        onCancel={() => setOpenImportForm(false)}
         errors={errors}
       />
     </Card>

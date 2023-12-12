@@ -7,12 +7,14 @@ use App\Actions\Api\Product\ExportProducts;
 use App\Actions\Api\Product\FetchPaginatedProducts;
 use App\Actions\Api\Product\DeleteProductImage;
 use App\Actions\Api\Product\FetchProductsForSelect;
+use App\Actions\Api\Product\ImportProducts;
 use App\Actions\Api\Product\ShowProduct;
 use App\Actions\Api\Product\StoreProduct;
 use App\Actions\Api\Product\UpdateProduct;
 use App\Actions\Api\Product\UploadProductImage;
 use App\Data\Product\ProductExportData;
 use App\Data\Product\ProductFilteringData;
+use App\Data\Product\ProductImportData;
 use App\Data\Product\ProductPaginationData;
 use App\Data\Product\ProductSortingData;
 use App\Data\Product\ProductStoreData;
@@ -29,6 +31,7 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\MediaCannotBeDeleted;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response as RespCode;
+use Throwable;
 
 final class ProductController extends ApiController
 {
@@ -42,6 +45,7 @@ final class ProductController extends ApiController
         private readonly UploadProductImage $uploadProductImageAction,
         private readonly DeleteProductImage $deleteProductImageAction,
         private readonly ExportProducts $exportProductsAction,
+        private readonly ImportProducts $importProductsAction,
     ) {
     }
 
@@ -140,6 +144,25 @@ final class ProductController extends ApiController
     }
 
     /**
+     * Delete several products.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
+     */
+    public function bulkDestroy(Request $request): Response
+    {
+        foreach (explode(',', $request->query('ids', '')) as $id) {
+            $this->deleteProductAction->handle($id);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Products successfully deleted',
+        ]);
+    }
+
+    /**
      * Upload product image.
      *
      * @param  Request  $request
@@ -199,5 +222,22 @@ final class ProductController extends ApiController
             file: $res->file,
             headers: $res->headers
         );
+    }
+
+    /**
+     * Import products from csv format.
+     *
+     * @param  Request  $request
+     *
+     * @return Response
+     * @throws Throwable
+     */
+    public function import(Request $request): Response
+    {
+        $importData = ProductImportData::fromRequest($request);
+
+        $this->importProductsAction->handle($importData);
+
+        return response(['status' => 'success']);
     }
 }

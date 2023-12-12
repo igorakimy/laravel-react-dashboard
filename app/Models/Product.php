@@ -303,4 +303,43 @@ class Product extends Model implements HasMedia
             ->fit(Manipulations::FIT_CROP, 300, 300)
             ->nonQueued();
     }
+
+    /**
+     * Get list of columns for importing/exporting to excel.
+     *
+     * @return string[]
+     */
+    public static function columnsForExcel(): array
+    {
+        return [
+            'name',
+            'sku',
+            'quantity',
+            'cost_price',
+            'selling_price',
+            'margin',
+            'width',
+            'height',
+            'weight',
+            'barcode',
+            'location',
+            'description',
+        ];
+    }
+
+    /**
+     * Get list of relation columns for importing/exporting to excel.
+     *
+     * @return string[]
+     */
+    public static function relationColumnsForExcel(): array
+    {
+        return [
+            'color',
+            'material',
+            'vendor',
+            'type',
+            'categories',
+        ];
+    }
 }

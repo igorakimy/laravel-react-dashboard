@@ -108,7 +108,6 @@ export default function Register() {
     <main
       style={{
         backgroundImage: "url(.././background.jpg)",
-        backgroundPosition: "0% 50%",
         backgroundSize: "cover",
         height: "100%",
       }}

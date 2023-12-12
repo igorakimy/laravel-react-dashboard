@@ -99,7 +99,7 @@ export default function DefaultLayout() {
             padding: 0,
             position: "sticky",
             top: 0,
-            zIndex: 200,
+            zIndex: 99,
             background: colorBgContainer,
           }}
         >
