@@ -424,6 +424,8 @@ const ProductsList = () => {
         return showExportModal();
       case "2":
         return showImportModal();
+      case "3":
+        return clearAll();
       default:
         return;
     }
@@ -535,16 +537,6 @@ const ProductsList = () => {
             </Button>
           </Dropdown>
 
-          <Button
-            size="small"
-            type="primary"
-            style={{backgroundColor: "green"}}
-            onClick={clearAll}
-            icon={<SyncOutlined/>}
-          >
-            Reload
-          </Button>
-
           {can("products.store") ? (
             <Button
               size="small"
@@ -554,7 +546,7 @@ const ProductsList = () => {
               }}
             >
               <PlusOutlined/>
-              Create
+              New
             </Button>
           ) : null}
 
@@ -572,6 +564,14 @@ const ProductsList = () => {
                   label: "Import",
                   key: "2",
                   icon: <DownloadOutlined/>,
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  label: "Refresh List",
+                  key: "3",
+                  icon: <SyncOutlined/>,
                 },
               ],
               onClick: handleAdditionalMenu,
