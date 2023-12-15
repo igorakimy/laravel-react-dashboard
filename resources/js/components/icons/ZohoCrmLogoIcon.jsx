@@ -4,7 +4,7 @@ const ZohoCrmLogoSvg = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
-    height="15.2"
+    height="15.6"
     xml:space="preserve"
   >
     <g style={{ opacity: ".9" }}>

@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ResponseServiceProvider::class,
         App\Providers\ZohoBooksServiceProvider::class,
+        App\Providers\ZohoInventoryServiceProvider::class,
     ])->toArray(),
 
     /*

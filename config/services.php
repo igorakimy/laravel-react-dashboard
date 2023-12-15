@@ -42,4 +42,16 @@ return [
         ],
         'use_cache' => true,
     ],
+
+    'zoho_inventory' => [
+        'domain' => env('ZOHO_INVENTORY_DOMAIN', 'com'),
+        'client_id' => env('ZOHO_INVENTORY_CLIENT_ID', 'client_id'),
+        'client_secret' => env('ZOHO_INVENTORY_CLIENT_SECRET', 'client_secret'),
+        'redirect_uri' => env('APP_URL') . '/check/zoho-inventory',
+        'organization_id' => env('ZOHO_INVENTORY_ORGANIZATION_ID', 'organization_id'),
+        'scopes' => [
+            'ZohoInventory.fullaccess.all',
+        ],
+        'use_cache' => true,
+    ],
 ];

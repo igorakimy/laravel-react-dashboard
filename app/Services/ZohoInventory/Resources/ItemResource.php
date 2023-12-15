@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Services\ZohoBooks\Resources;
+namespace App\Services\ZohoInventory\Resources;
 
-use App\Data\Integration\ZohoBooks\Item\ItemEditPageResponseData;
-use App\Data\Integration\ZohoBooks\Item\ItemResponseData;
-use App\Data\Integration\ZohoBooks\Item\ItemsResponseData;
+use App\Data\Integration\ZohoInventory\Item\ItemEditPageResponseData;
+use App\Data\Integration\ZohoInventory\Item\ItemResponseData;
+use App\Data\Integration\ZohoInventory\Item\ItemsResponseData;
 use App\Helpers\AttachmentHelper;
-use App\Services\ZohoBooks\ZohoBooksService;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Services\ZohoInventory\ZohoInventoryService;
+use Illuminate\Http\UploadedFile;
 
 final class ItemResource
 {
     public function __construct(
-        private readonly ZohoBooksService $service,
+        private readonly ZohoInventoryService $service,
     ) {
     }
 
@@ -37,7 +37,7 @@ final class ItemResource
     /**
      * Search the items by criteria.
      *
-     * @param  array  $criteria
+     * @param  array  $criteria Search criteria, for example: ['sku' => '123456']
      *
      * @return ItemsResponseData
      */
@@ -81,7 +81,7 @@ final class ItemResource
      *
      * @return ItemEditPageResponseData
      */
-    public function getForEditPage(string $itemID): ItemEditPageResponseData
+    public function getByIdForEditPage(string $itemID): ItemEditPageResponseData
     {
         $url = '/items/editpage';
 
@@ -145,7 +145,7 @@ final class ItemResource
     }
 
     /**
-     * Update item main image.
+     * Update main image of the item.
      *
      * @param  string  $itemID
      * @param  UploadedFile  $image

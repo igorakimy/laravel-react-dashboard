@@ -18,9 +18,11 @@ use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ZohoBooksSettingsController;
+use App\Http\Controllers\Api\ZohoInventorySettingsController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Integration\IntegrationFieldController;
 use App\Http\Controllers\Integration\ZohoBooksController;
+use App\Http\Controllers\Integration\ZohoInventoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -134,6 +136,11 @@ Route::middleware(['auth:sanctum', 'permission'])->group(function() {
     Route::put('/settings/zoho-books', [ZohoBooksSettingsController::class, 'update'])
          ->name('settings.zoho_books.update');
 
+    Route::get('/settings/zoho-inventory', [ZohoInventorySettingsController::class, 'index'])
+         ->name('settings.zoho_inventory.index');
+    Route::put('/settings/zoho-inventory', [ZohoInventorySettingsController::class, 'update'])
+         ->name('settings.zoho_inventory.update');
+
     /**
      * Media routes.
      */
@@ -165,6 +172,16 @@ Route::middleware(['auth:sanctum'])->prefix('integrations')->group(function () {
              ->name('integrations.zoho_books.authenticate');
         Route::get('/callback', [ZohoBooksController::class, 'handleAuthCallback'])
              ->name('integrations.zoho_books.callback');
+    });
+
+    /**
+     * Zoho Inventory routes.
+     */
+    Route::group(['prefix' => 'zoho-inventory'], function () {
+        Route::get('/authenticate', [ZohoInventoryController::class, 'authenticateUrl'])
+             ->name('integrations.zoho_inventory.authenticate');
+        Route::get('/callback', [ZohoInventoryController::class, 'handleAuthCallback'])
+             ->name('integrations.zoho_inventory.callback');
     });
 });
 

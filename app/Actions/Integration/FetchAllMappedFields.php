@@ -17,7 +17,7 @@ final class FetchAllMappedFields extends IntegrationAction
         $integration = Integration::query()->where(
             'slug',
             $integrationSlug
-        )->first();
+        )->firstOrFail();
 
         $integrationFields = $integration
             ->fields()
@@ -29,7 +29,9 @@ final class FetchAllMappedFields extends IntegrationAction
             ->where('is_primary', true)
             ->first();
 
-        $integrationFields->push($primaryField);
+        if ($primaryField) {
+            $integrationFields->push($primaryField);
+        }
 
         $integrationFields = $integrationFields->sortBy('is_primary');
 

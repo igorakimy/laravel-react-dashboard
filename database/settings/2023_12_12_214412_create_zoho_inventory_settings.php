@@ -7,7 +7,7 @@ return new class extends SettingsMigration
 {
     public function up(): void
     {
-        $serviceName = Integration::ZOHO_BOOKS->value;
+        $serviceName = Integration::ZOHO_INVENTORY->value;
 
         $this->migrator->add("$serviceName.domain", config("services.$serviceName.domain"));
         $this->migrator->add("$serviceName.client_id", config("services.$serviceName.client_id"));

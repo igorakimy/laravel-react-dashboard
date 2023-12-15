@@ -2,6 +2,7 @@
 
 use App\Models\Setting;
 use App\Settings\ZohoBooksSettings;
+use App\Settings\ZohoInventorySettings;
 
 return [
 
@@ -11,6 +12,7 @@ return [
      */
     'settings' => [
         ZohoBooksSettings::class,
+        ZohoInventorySettings::class,
     ],
 
     /*

@@ -3,6 +3,8 @@ import ZohoBooksSettings from "./ZohoBooksSettings.jsx";
 import Icon from "@ant-design/icons";
 import ZohoBooksLogoIcon from "../../components/icons/ZohoBooksLogoIcon.jsx";
 import ZohoCrmLogoIcon from "../../components/icons/ZohoCrmLogoIcon.jsx";
+import ZohoInventoryLogoIcon from "../../components/icons/ZohoInventoryLogoIcon.jsx";
+import ZohoInventorySettings from "./ZohoInventorySettings.jsx";
 
 const IntegrationSettings = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -35,13 +37,19 @@ const IntegrationSettings = () => {
   const integrations = [
     {
       label: "Zoho Books",
-      icon: <ZohoBooksLogoIcon style={{ height: 12, fill: "#1677ff" }} />,
+      icon: <ZohoBooksLogoIcon style={{ height: 12, fill: "#1677ff", marginRight: 5 }} />,
       key: "zoho_books",
       children: <ZohoBooksSettings />,
     },
     {
+      label: "Zoho Inventory",
+      icon: <ZohoInventoryLogoIcon style={{ height: 12, fill: "#1677ff", marginRight: 5 }} />,
+      key: "zoho_inventory",
+      children: <ZohoInventorySettings />,
+    },
+    {
       label: "Zoho CRM",
-      icon: <ZohoCrmLogoIcon style={{ height: 12, fill: "#1677ff" }} />,
+      icon: <ZohoCrmLogoIcon style={{ height: 12, fill: "#1677ff", marginRight: 5 }} />,
       key: "zoho_crm",
       children: (
         <Card type="inner" title="Connection" style={{ width: 800 }}>
