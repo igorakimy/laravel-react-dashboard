@@ -53,18 +53,19 @@ const RolesList = () => {
       render: (_, { permissions }) => (
         <Space size={[0, 4]} wrap>
           {permissions.length > 0 ? (
-            permissions.map((permission) => {
+            permissions.slice(0, 2).map((permission) => {
               return (
-                <Tag color="#389e0d" key={permission.name}>
-                  {permission.display_name.toUpperCase()}
+                <Tag color="blue" key={permission.name}>
+                  {permission.display_name}
                 </Tag>
               );
             })
           ) : (
-            <Tag color="#389e0d" key="all">
+            <Tag color="blue" key="all">
               All
             </Tag>
           )}
+          {permissions.length > 2 ? '...' : ''}
         </Space>
       ),
     },

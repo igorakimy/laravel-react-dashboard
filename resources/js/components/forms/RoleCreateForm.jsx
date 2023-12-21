@@ -55,6 +55,7 @@ const RoleCreateForm = ({ open, onCreate, onCancel, errors, onError }) => {
   return (
     <Modal
       maskClosable={false}
+      destroyOnClose={true}
       open={open}
       okText="Create"
       okButtonProps={{

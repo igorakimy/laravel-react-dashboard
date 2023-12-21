@@ -54,4 +54,17 @@ return [
         ],
         'use_cache' => true,
     ],
+
+    'zoho_crm' => [
+        'domain' => env('ZOHO_CRM_DOMAIN', 'com'),
+        'client_id' => env('ZOHO_CRM_CLIENT_ID', 'client_id'),
+        'client_secret' => env('ZOHO_CRM_CLIENT_SECRET', 'client_secret'),
+        'redirect_uri' => env('APP_URL') . '/check/zoho-crm',
+        'scopes' => [
+            'ZohoCRM.modules.ALL',
+            'ZohoCRM.settings.ALL',
+            'ZohoCRM.Files.CREATE',
+        ],
+        'use_cache' => true,
+    ],
 ];

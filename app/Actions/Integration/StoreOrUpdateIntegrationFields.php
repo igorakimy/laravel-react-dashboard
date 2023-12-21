@@ -2,21 +2,16 @@
 
 namespace App\Actions\Integration;
 
-use App\Actions\Integration\ZohoBooks\Setting\FetchAllItemFields as ZohoBooksFetchAllItemFields;
-use App\Actions\Integration\ZohoInventory\Setting\FetchAllItemFields as ZohoInventoryFetchAllItemFields;
 use App\Data\Integration\IntegrationData;
-use App\Data\Integration\ZohoBooks\Setting\FieldData as ZohoBooksFieldData;
-use App\Data\Integration\ZohoInventory\Setting\FieldData as ZohoInventoryFieldData;
-use App\Data\IntegrationField\IntegrationFieldData;
 use App\Enums\Integration as IntegrationSystem;
 use Exception;
 
 final class StoreOrUpdateIntegrationFields extends IntegrationAction
 {
     public function __construct(
-        private readonly ZohoBooksFetchAllItemFields $zohoBooksFetchAllItemFieldsAction,
-        private readonly ZohoInventoryFetchAllItemFields $zohoInventoryFetchAllItemFieldsAction,
-        private readonly UpdateIntegrationField $updateIntegrationFieldAction,
+        private readonly StoreIntegrationFieldsFromZohoBooks $storeIntegrationFieldsFromZohoBooksAction,
+        private readonly StoreIntegrationFieldsFromZohoInventory $storeIntegrationFieldsFromZohoInventoryAction,
+        private readonly StoreIntegrationFieldsFromZohoCrm $storeIntegrationFieldsFromZohoCrmAction,
     ) {
     }
 
@@ -29,100 +24,14 @@ final class StoreOrUpdateIntegrationFields extends IntegrationAction
 
         switch ($integrationSystem) {
             case IntegrationSystem::ZOHO_BOOKS:
-                $data = $this->zohoBooksFetchAllItemFieldsAction->handle();
-
-                if ( ! $data->success) {
-                    throw new Exception($data->message, 400);
-                }
-
-                /** @var ZohoBooksFieldData $fieldData */
-                foreach ($data->fields as $fieldData) {
-                    $integrationFieldData = $this->getZohoBooksIntegrationFieldData(
-                        $integrationData,
-                        $fieldData
-                    );
-
-                    $this->updateIntegrationFieldAction->handle($integrationFieldData);
-                }
+                $this->storeIntegrationFieldsFromZohoBooksAction->handle($integrationData);
                 break;
             case IntegrationSystem::ZOHO_INVENTORY:
-                $data = $this->zohoInventoryFetchAllItemFieldsAction->handle();
-
-                if ( ! $data->success) {
-                    throw new Exception($data->message, 400);
-                }
-
-                /** @var ZohoInventoryFieldData $fieldData */
-                foreach ($data->fields as $fieldData) {
-                    $integrationFieldData = $this->getZohoInventoryIntegrationFieldData(
-                        $integrationData,
-                        $fieldData
-                    );
-
-                    $this->updateIntegrationFieldAction->handle($integrationFieldData);
-                }
+                $this->storeIntegrationFieldsFromZohoInventoryAction->handle($integrationData);
                 break;
-            default:
+            case IntegrationSystem::ZOHO_CRM:
+                $this->storeIntegrationFieldsFromZohoCrmAction->handle($integrationData);
+                break;
         }
-    }
-
-    /**
-     * Get Zoho Books integration field data.
-     *
-     * @param  IntegrationData  $integrationData
-     * @param  ZohoBooksFieldData  $fieldData
-     *
-     * @return IntegrationFieldData
-     */
-    private function getZohoBooksIntegrationFieldData(
-        IntegrationData $integrationData,
-        ZohoBooksFieldData $fieldData
-    ): IntegrationFieldData {
-        return IntegrationFieldData::from([
-            'integration'  => $integrationData,
-            'field_id'     => $fieldData->field_id ?: null,
-            'name'         => $fieldData->field_name_formatted,
-            'api_name'     => $fieldData->field_name,
-            'data_type'    => $fieldData->data_type,
-            'order'        => $fieldData->index ?: 0,
-            'is_active'    => $fieldData->is_active,
-            'is_custom'    => $fieldData->is_custom_field,
-            'is_required'  => $fieldData->is_mandatory,
-            'is_permanent' => true,
-            'filterable'   => true,
-            'searchable'   => true,
-            'sortable'     => true,
-            'values'       => $fieldData->values,
-        ]);
-    }
-
-    /**
-     * Get Zoho Inventory integration field data.
-     *
-     * @param  IntegrationData  $integrationData
-     * @param  ZohoInventoryFieldData  $fieldData
-     *
-     * @return IntegrationFieldData
-     */
-    private function getZohoInventoryIntegrationFieldData(
-        IntegrationData $integrationData,
-        ZohoInventoryFieldData $fieldData
-    ): IntegrationFieldData {
-        return IntegrationFieldData::from([
-            'integration'  => $integrationData,
-            'field_id'     => $fieldData->field_id ?: null,
-            'name'         => $fieldData->field_name_formatted,
-            'api_name'     => $fieldData->field_name,
-            'data_type'    => $fieldData->data_type,
-            'order'        => $fieldData->index ?: 0,
-            'is_active'    => $fieldData->is_active,
-            'is_custom'    => $fieldData->is_custom_field,
-            'is_required'  => $fieldData->is_mandatory,
-            'is_permanent' => true,
-            'filterable'   => true,
-            'searchable'   => true,
-            'sortable'     => true,
-            'values'       => $fieldData->values,
-        ]);
     }
 }

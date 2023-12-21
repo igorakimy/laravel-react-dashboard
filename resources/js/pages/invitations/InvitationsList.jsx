@@ -62,8 +62,8 @@ const InvitationsList = () => {
         <Space size={[0, 4]} wrap>
           {roles.map((role) => {
             return (
-              <Tag color="#389e0d" key={role.name}>
-                {role.name.toUpperCase()}
+              <Tag color="green" key={role.name}>
+                {role.name}
               </Tag>
             );
           })}
@@ -291,7 +291,7 @@ const InvitationsList = () => {
               setOpenCreateForm(true);
             }}
           >
-            Create
+            New
           </Button>
         ) : null
       }

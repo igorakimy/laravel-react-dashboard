@@ -360,7 +360,7 @@ html, body {
     margin: 0;
 }
 
-#app, #app>div{
+#app{
     height: 100%;
 }
 

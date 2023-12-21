@@ -5,6 +5,7 @@ import ZohoBooksLogoIcon from "../../components/icons/ZohoBooksLogoIcon.jsx";
 import ZohoCrmLogoIcon from "../../components/icons/ZohoCrmLogoIcon.jsx";
 import ZohoInventoryLogoIcon from "../../components/icons/ZohoInventoryLogoIcon.jsx";
 import ZohoInventorySettings from "./ZohoInventorySettings.jsx";
+import ZohoCrmSettings from "./ZohoCrmSettings.jsx";
 
 const IntegrationSettings = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -51,11 +52,7 @@ const IntegrationSettings = () => {
       label: "Zoho CRM",
       icon: <ZohoCrmLogoIcon style={{ height: 12, fill: "#1677ff", marginRight: 5 }} />,
       key: "zoho_crm",
-      children: (
-        <Card type="inner" title="Connection" style={{ width: 800 }}>
-          Coming soon...
-        </Card>
-      ),
+      children: <ZohoCrmSettings />,
     },
   ];
 

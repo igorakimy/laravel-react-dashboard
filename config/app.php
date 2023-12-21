@@ -171,6 +171,7 @@ return [
         App\Providers\ResponseServiceProvider::class,
         App\Providers\ZohoBooksServiceProvider::class,
         App\Providers\ZohoInventoryServiceProvider::class,
+        App\Providers\ZohoCrmServiceProvider::class,
     ])->toArray(),
 
     /*
