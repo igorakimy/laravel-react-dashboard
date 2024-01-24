@@ -152,7 +152,9 @@ final class ProductController extends ApiController
      */
     public function bulkDestroy(Request $request): Response
     {
-        foreach (explode(',', $request->query('ids', '')) as $id) {
+        $ids = explode(',', $request->query('ids', ''));
+
+        foreach ($ids as $id) {
             $this->deleteProductAction->handle($id);
         }
 

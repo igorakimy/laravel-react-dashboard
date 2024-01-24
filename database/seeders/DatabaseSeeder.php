@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             FieldSeeder::class,
             IntegrationSeeder::class,
+            LocalFieldSeeder::class,
         ]);
     }
 }

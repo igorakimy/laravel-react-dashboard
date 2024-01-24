@@ -171,7 +171,7 @@ class LocalFieldSeeder extends Seeder
             ],
             [
                 'name'        => 'Color',
-                'slug'        => 'color',
+                'slug'        => 'color_id',
                 'field_type'  => FieldType::SELECT,
                 'order'       => 12,
                 'validations' => [
@@ -187,7 +187,7 @@ class LocalFieldSeeder extends Seeder
             ],
             [
                 'name'        => 'Material',
-                'slug'        => 'material',
+                'slug'        => 'material_id',
                 'field_type'  => FieldType::SELECT,
                 'order'       => 13,
                 'validations' => [
@@ -203,7 +203,7 @@ class LocalFieldSeeder extends Seeder
             ],
             [
                 'name'        => 'Vendor',
-                'slug'        => 'vendor',
+                'slug'        => 'vendor_id',
                 'field_type'  => FieldType::SELECT,
                 'order'       => 14,
                 'validations' => [
@@ -219,7 +219,7 @@ class LocalFieldSeeder extends Seeder
             ],
             [
                 'name'        => 'Type',
-                'slug'        => 'type',
+                'slug'        => 'type_id',
                 'field_type'  => FieldType::SELECT,
                 'order'       => 15,
                 'validations' => [

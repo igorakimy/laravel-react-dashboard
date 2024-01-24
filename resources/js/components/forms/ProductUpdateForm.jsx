@@ -19,7 +19,7 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axiosClient from "../../axios-client.js";
 import TextArea from "antd/es/input/TextArea";
 import {
@@ -34,13 +34,13 @@ import ComponentsTable from "../tables/ComponentsTable.jsx";
 import MediaUpdateModal from "../modals/MediaUpdateModal.jsx";
 
 const ProductUpdateForm = ({
-  open,
-  product,
-  onUpdate,
-  onCancel,
-  errors,
-  setErrors,
-}) => {
+                             open,
+                             product,
+                             onUpdate,
+                             onCancel,
+                             errors,
+                             setErrors,
+                           }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const [imageUpdateForm] = Form.useForm();
@@ -71,9 +71,10 @@ const ProductUpdateForm = ({
   const [bulkActionsVisible, setBulkActionsVisible] = useState(false);
   const [bulkEditOpen, setBulkEditOpen] = useState(false);
 
-  const { Title } = Typography;
-  const { Dragger } = Upload;
-  const { confirm } = Modal;
+  const {Title} = Typography;
+  const {Dragger} = Upload;
+  const {Option} = Select;
+  const {confirm} = Modal;
 
   useEffect(() => {
     getLocalFields();
@@ -87,6 +88,64 @@ const ProductUpdateForm = ({
     setErrors({});
     setBulkActionsVisible(false);
 
+    initFormWithValues();
+
+    setCatalogFileList(
+      product.media
+        ? product.media
+          .filter((m) => m.collection_name === "catalog_images")
+          .map((m) => {
+            return {
+              name: m.file_name,
+              type: m.mime_type,
+              size: m.size,
+              url: m.url,
+              response: {
+                uuid: m.id,
+                alt: m.custom_properties?.alt && "",
+                tooltip: m.custom_properties?.tooltip && "",
+                primary: m.custom_properties?.primary && "",
+                integrations: m.custom_properties?.integrations && "",
+              },
+            };
+          })
+        : [],
+    );
+
+    setProductFileList(
+      product.media
+        ? product.media
+          .filter((m) => m.collection_name === "product_images")
+          .map((m) => {
+            return {
+              name: m.file_name,
+              type: m.mime_type,
+              size: m.size,
+              url: m.url,
+              response: {uuid: m.id},
+            };
+          })
+        : [],
+    );
+
+    setVectorFileList(
+      product.media
+        ? product.media
+          .filter((m) => m.collection_name === "vector_images")
+          .map((m) => {
+            return {
+              name: m.file_name,
+              type: m.mime_type,
+              size: m.size,
+              url: m.url,
+              response: {uuid: m.id},
+            };
+          })
+        : [],
+    );
+  }, [product]);
+
+  const initFormWithValues = () => {
     form.setFieldsValue({
       name: product.name,
       sku: product.sku,
@@ -109,61 +168,7 @@ const ProductUpdateForm = ({
       caption: product.caption,
       description: product.description,
     });
-
-    setCatalogFileList(
-      product.media
-        ? product.media
-            .filter((m) => m.collection_name === "catalog_images")
-            .map((m) => {
-              return {
-                name: m.file_name,
-                type: m.mime_type,
-                size: m.size,
-                url: m.url,
-                response: {
-                  uuid: m.id,
-                  alt: m.custom_properties?.alt && "",
-                  tooltip: m.custom_properties?.tooltip && "",
-                  primary: m.custom_properties?.primary && "",
-                  integrations: m.custom_properties?.integrations && "",
-                },
-              };
-            })
-        : [],
-    );
-
-    setProductFileList(
-      product.media
-        ? product.media
-            .filter((m) => m.collection_name === "product_images")
-            .map((m) => {
-              return {
-                name: m.file_name,
-                type: m.mime_type,
-                size: m.size,
-                url: m.url,
-                response: { uuid: m.id },
-              };
-            })
-        : [],
-    );
-
-    setVectorFileList(
-      product.media
-        ? product.media
-            .filter((m) => m.collection_name === "vector_images")
-            .map((m) => {
-              return {
-                name: m.file_name,
-                type: m.mime_type,
-                size: m.size,
-                url: m.url,
-                response: { uuid: m.id },
-              };
-            })
-        : [],
-    );
-  }, [product]);
+  }
 
   const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -192,15 +197,15 @@ const ProductUpdateForm = ({
     // console.log(imageUpdateForm);
   };
 
-  const catalogFilesOnChange = ({ fileList: newFileList }) => {
+  const catalogFilesOnChange = ({fileList: newFileList}) => {
     setCatalogFileList(newFileList);
   };
 
-  const productFilesOnChange = ({ fileList: newFileList }) => {
+  const productFilesOnChange = ({fileList: newFileList}) => {
     setProductFileList(newFileList);
   };
 
-  const vectorFilesOnChange = ({ fileList: newFileList }) => {
+  const vectorFilesOnChange = ({fileList: newFileList}) => {
     setVectorFileList(newFileList);
   };
 
@@ -260,7 +265,7 @@ const ProductUpdateForm = ({
   const getLocalFields = () => {
     axiosClient
       .get("/local-fields")
-      .then(({ data }) => {
+      .then(({data}) => {
         setLocalFields(data);
       })
       .catch((err) => {
@@ -271,7 +276,7 @@ const ProductUpdateForm = ({
   const getIntegrations = () => {
     axiosClient
       .get("/integrations")
-      .then(({ data }) => {
+      .then(({data}) => {
         setIntegrations(data);
       })
       .catch((err) => {
@@ -282,7 +287,7 @@ const ProductUpdateForm = ({
   const getMedia = (mediaId) => {
     axiosClient
       .get("/medias/" + mediaId)
-      .then(({ data }) => {
+      .then(({data}) => {
         setMedia(data);
       })
       .catch((err) => {
@@ -293,7 +298,7 @@ const ProductUpdateForm = ({
   const getCategories = () => {
     axiosClient
       .get("/categories?kind=select")
-      .then(({ data }) => {
+      .then(({data}) => {
         setCategories(
           data.map((item) => {
             return {
@@ -311,7 +316,7 @@ const ProductUpdateForm = ({
   const getColors = () => {
     axiosClient
       .get("/colors")
-      .then(({ data }) => {
+      .then(({data}) => {
         setColors(
           data.map((item) => {
             return {
@@ -329,7 +334,7 @@ const ProductUpdateForm = ({
   const getMaterials = () => {
     axiosClient
       .get("/materials")
-      .then(({ data }) => {
+      .then(({data}) => {
         setMaterials(
           data.map((item) => {
             return {
@@ -347,7 +352,7 @@ const ProductUpdateForm = ({
   const getVendors = () => {
     axiosClient
       .get("/vendors")
-      .then(({ data }) => {
+      .then(({data}) => {
         setVendors(
           data.map((item) => {
             return {
@@ -365,7 +370,7 @@ const ProductUpdateForm = ({
   const getTypes = () => {
     axiosClient
       .get("/types")
-      .then(({ data }) => {
+      .then(({data}) => {
         setTypes(
           data.map((item) => {
             return {
@@ -387,11 +392,12 @@ const ProductUpdateForm = ({
         onUpdate(product?.id, values);
         // setTimeout(form.resetFields, 500);
       })
-      .catch((err) => {});
+      .catch((err) => {
+      });
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const {name, value} = e.target;
     form.setFieldsValue({
       [name]: value,
       errors: [],
@@ -479,7 +485,7 @@ const ProductUpdateForm = ({
             className="anticon-delete"
             onClick={() => actions.preview()}
           />
-          <DeleteOutlined title="Delete" onClick={() => actions.remove()} />
+          <DeleteOutlined title="Delete" onClick={() => actions.remove()}/>
         </span>
       </div>
     );
@@ -501,8 +507,8 @@ const ProductUpdateForm = ({
     bulkEditForm.validateFields().then((values) => {
       bulkEditForm.resetFields();
       axiosClient
-        .put("/medias/bulk-update", { ids: ids, ...values })
-        .then(({ data }) => {
+        .put("/medias/bulk-update", {ids: ids, ...values})
+        .then(({data}) => {
           messageApi.success(data.message);
         })
         .catch((err) => {
@@ -516,7 +522,7 @@ const ProductUpdateForm = ({
   const showDeleteConfirm = () => {
     confirm({
       title: "Are you sure delete these images?",
-      icon: <ExclamationCircleFilled />,
+      icon: <ExclamationCircleFilled/>,
       content:
         "Selected images will be removed forever and you can not restore it.",
       okText: "Yes",
@@ -528,7 +534,7 @@ const ProductUpdateForm = ({
       onOk() {
         axiosClient
           .delete("/medias/bulk-delete?ids=" + selectedMedia.join(","))
-          .then(({ data }) => {
+          .then(({data}) => {
             catalogFilesOnChange({
               fileList: catalogFileList.filter((f) => {
                 return !selectedMedia.includes(f.response.uuid);
@@ -540,7 +546,8 @@ const ProductUpdateForm = ({
 
             messageApi.success(data.message);
           })
-          .catch((err) => {});
+          .catch((err) => {
+          });
       },
       onCancel() {
         console.log("Cancel");
@@ -587,7 +594,7 @@ const ProductUpdateForm = ({
         validateStatus={errors[field.slug] ? "error" : null}
         help={errors[field.slug] ? errors[field.slug][0] : null}
       >
-        {field.field_type === "text" && <Input onChange={handleInputChange} />}
+        {field.field_type === "text" && <Input onChange={handleInputChange}/>}
 
         {field.field_type === "number" && (
           <InputNumber
@@ -620,7 +627,7 @@ const ProductUpdateForm = ({
         )}
 
         {field.field_type === "textarea" && (
-          <TextArea onChange={handleInputChange} />
+          <TextArea onChange={handleInputChange}/>
         )}
       </Form.Item>
     );
@@ -658,7 +665,7 @@ const ProductUpdateForm = ({
     >
       {contextHolder}
       <Title level={4}>Edit Product</Title>
-      <Divider style={{ margin: "0.6rem 0" }}></Divider>
+      <Divider style={{margin: "0.6rem 0"}}></Divider>
       <Tabs
         defaultActiveKey="1"
         tabPosition="left"
@@ -668,18 +675,18 @@ const ProductUpdateForm = ({
             label: "Data",
             children: (
               <Form
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
                 form={form}
-                initialValues={{ ...product }}
+                initialValues={{...product}}
                 labelAlign="left"
                 onValuesChange={onValuesChange}
                 onFieldsChange={() =>
                   setClientReady(
                     !form.isFieldsTouched(true) ||
-                      form
-                        .getFieldsError()
-                        .some((field) => field.errors.length > 0),
+                    form
+                      .getFieldsError()
+                      .some((field) => field.errors.length > 0),
                   )
                 }
               >
@@ -709,7 +716,7 @@ const ProductUpdateForm = ({
               <Space
                 direction="vertical"
                 size="middle"
-                style={{ display: "flex" }}
+                style={{display: "flex"}}
               >
                 <Card
                   size="small"
@@ -740,7 +747,7 @@ const ProductUpdateForm = ({
                       >
                         <Space>
                           Bulk Actions
-                          <DownOutlined />
+                          <DownOutlined/>
                         </Space>
                       </Button>
                     </Dropdown>
@@ -750,30 +757,30 @@ const ProductUpdateForm = ({
                     fileList={catalogFileList}
                     name="catalog_images"
                     customRequest={({
-                      file,
-                      onSuccess,
-                      onError,
-                      onProgress,
-                    }) => {
+                                      file,
+                                      onSuccess,
+                                      onError,
+                                      onProgress,
+                                    }) => {
                       let formData = new FormData();
                       formData.append("image", file);
                       axiosClient
                         .post(
                           "/products/" +
-                            product.id +
-                            "/upload-media/catalog_images",
+                          product.id +
+                          "/upload-media/catalog_images",
                           formData,
                           {
                             onUploadProgress: (event) => {
                               let percent = Math.floor(
                                 (event.loaded / event.total) * 100,
                               );
-                              onProgress({ percent });
+                              onProgress({percent});
                             },
                           },
                         )
                         .then((response) => {
-                          onSuccess({ uuid: response.data?.id });
+                          onSuccess({uuid: response.data?.id});
                         })
                         .catch((error) => {
                           onError(error);
@@ -793,7 +800,7 @@ const ProductUpdateForm = ({
                     }
                   >
                     <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
+                      <InboxOutlined/>
                     </p>
                     <p className="ant-upload-text">
                       Click or drag image to this area to upload
@@ -851,30 +858,30 @@ const ProductUpdateForm = ({
                     fileList={productFileList}
                     name="product_images"
                     customRequest={({
-                      file,
-                      onSuccess,
-                      onError,
-                      onProgress,
-                    }) => {
+                                      file,
+                                      onSuccess,
+                                      onError,
+                                      onProgress,
+                                    }) => {
                       let formData = new FormData();
                       formData.append("image", file);
                       axiosClient
                         .post(
                           "/products/" +
-                            product.id +
-                            "/upload-media/product_images",
+                          product.id +
+                          "/upload-media/product_images",
                           formData,
                           {
                             onUploadProgress: (event) => {
                               let percent = Math.floor(
                                 (event.loaded / event.total) * 100,
                               );
-                              onProgress({ percent });
+                              onProgress({percent});
                             },
                           },
                         )
                         .then((response) => {
-                          onSuccess({ uuid: response.data?.id });
+                          onSuccess({uuid: response.data?.id});
                         })
                         .catch((error) => {
                           onError(error);
@@ -894,7 +901,7 @@ const ProductUpdateForm = ({
                     }
                   >
                     <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
+                      <InboxOutlined/>
                     </p>
                     <p className="ant-upload-text">
                       Click or drag image to this area to upload
@@ -911,30 +918,30 @@ const ProductUpdateForm = ({
                     name="vector_images"
                     maxCount={1}
                     customRequest={({
-                      file,
-                      onSuccess,
-                      onError,
-                      onProgress,
-                    }) => {
+                                      file,
+                                      onSuccess,
+                                      onError,
+                                      onProgress,
+                                    }) => {
                       let formData = new FormData();
                       formData.append("vector_image", file);
                       axiosClient
                         .post(
                           "/products/" +
-                            product.id +
-                            "/upload-media/vector_image",
+                          product.id +
+                          "/upload-media/vector_image",
                           formData,
                           {
                             onUploadProgress: (event) => {
                               let percent = Math.floor(
                                 (event.loaded / event.total) * 100,
                               );
-                              onProgress({ percent });
+                              onProgress({percent});
                             },
                           },
                         )
                         .then((response) => {
-                          onSuccess({ uuid: response.data?.id });
+                          onSuccess({uuid: response.data?.id});
                         })
                         .catch((error) => {
                           onError(error);
@@ -952,7 +959,7 @@ const ProductUpdateForm = ({
                     beforeUpload={(file) => beforeUpload(file, "vector_images")}
                   >
                     <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
+                      <InboxOutlined/>
                     </p>
                     <p className="ant-upload-text">
                       Click or drag image to this area to upload
@@ -985,7 +992,7 @@ const ProductUpdateForm = ({
                   onChange={handleProductIsComposite}
                   size="default"
                 />
-                <ComponentsTable open={componentsOpen} product={product} />
+                <ComponentsTable open={componentsOpen} product={product}/>
               </>
             ),
           },

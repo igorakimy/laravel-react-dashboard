@@ -19,7 +19,6 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import axiosClient from "../../axios-client.js";
-import SearchInput from "../inputs/SearchInput.jsx";
 
 // const EditableContext = React.createContext(null);
 
